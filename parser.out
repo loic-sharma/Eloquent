@@ -1,0 +1,318 @@
+State 0:
+          program ::= * statements
+          statements ::= * statements statement
+          statements ::= * statement
+          statement ::= * assignment
+          statement ::= * expression SEMICOLON
+          assignment ::= * IDENTIFIER EQUALS expression SEMICOLON
+          expression ::= * expression ADD expression
+          expression ::= * expression SUB expression
+          expression ::= * expression MULT expression
+          expression ::= * expression DIV expression
+          expression ::= * expression MOD expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                    IDENTIFIER shift  12
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                       program accept
+                    statements shift  1
+                     statement shift  13
+                    assignment shift  23
+                    expression shift  9
+                       literal shift  18
+
+State 1:
+      (0) program ::= statements *
+          statements ::= statements * statement
+          statement ::= * assignment
+          statement ::= * expression SEMICOLON
+          assignment ::= * IDENTIFIER EQUALS expression SEMICOLON
+          expression ::= * expression ADD expression
+          expression ::= * expression SUB expression
+          expression ::= * expression MULT expression
+          expression ::= * expression DIV expression
+          expression ::= * expression MOD expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                             $ reduce 0
+                    IDENTIFIER shift  12
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                     statement shift  24
+                    assignment shift  23
+                    expression shift  9
+                       literal shift  18
+
+State 2:
+          assignment ::= IDENTIFIER EQUALS * expression SEMICOLON
+          expression ::= * expression ADD expression
+          expression ::= * expression SUB expression
+          expression ::= * expression MULT expression
+          expression ::= * expression DIV expression
+          expression ::= * expression MOD expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                    IDENTIFIER shift  15
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                    expression shift  8
+                       literal shift  18
+
+State 3:
+          expression ::= * expression ADD expression
+          expression ::= * expression SUB expression
+          expression ::= * expression MULT expression
+          expression ::= * expression DIV expression
+          expression ::= * expression MOD expression
+          expression ::= expression MOD * expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                    IDENTIFIER shift  15
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                    expression shift  19
+                       literal shift  18
+
+State 4:
+          expression ::= * expression ADD expression
+          expression ::= * expression SUB expression
+          expression ::= * expression MULT expression
+          expression ::= * expression DIV expression
+          expression ::= expression DIV * expression
+          expression ::= * expression MOD expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                    IDENTIFIER shift  15
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                    expression shift  20
+                       literal shift  18
+
+State 5:
+          expression ::= * expression ADD expression
+          expression ::= * expression SUB expression
+          expression ::= * expression MULT expression
+          expression ::= expression MULT * expression
+          expression ::= * expression DIV expression
+          expression ::= * expression MOD expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                    IDENTIFIER shift  15
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                    expression shift  21
+                       literal shift  18
+
+State 6:
+          expression ::= * expression ADD expression
+          expression ::= * expression SUB expression
+          expression ::= expression SUB * expression
+          expression ::= * expression MULT expression
+          expression ::= * expression DIV expression
+          expression ::= * expression MOD expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                    IDENTIFIER shift  15
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                    expression shift  10
+                       literal shift  18
+
+State 7:
+          expression ::= * expression ADD expression
+          expression ::= expression ADD * expression
+          expression ::= * expression SUB expression
+          expression ::= * expression MULT expression
+          expression ::= * expression DIV expression
+          expression ::= * expression MOD expression
+          expression ::= * literal
+          literal ::= * INTEGER
+          literal ::= * DOUBLE
+          literal ::= * IDENTIFIER
+
+                    IDENTIFIER shift  15
+                       INTEGER shift  17
+                        DOUBLE shift  16
+                    expression shift  11
+                       literal shift  18
+
+State 8:
+          assignment ::= IDENTIFIER EQUALS expression * SEMICOLON
+          expression ::= expression * ADD expression
+          expression ::= expression * SUB expression
+          expression ::= expression * MULT expression
+          expression ::= expression * DIV expression
+          expression ::= expression * MOD expression
+
+                           ADD shift  7
+                           SUB shift  6
+                          MULT shift  5
+                           DIV shift  4
+                           MOD shift  3
+                     SEMICOLON shift  14
+
+State 9:
+          statement ::= expression * SEMICOLON
+          expression ::= expression * ADD expression
+          expression ::= expression * SUB expression
+          expression ::= expression * MULT expression
+          expression ::= expression * DIV expression
+          expression ::= expression * MOD expression
+
+                           ADD shift  7
+                           SUB shift  6
+                          MULT shift  5
+                           DIV shift  4
+                           MOD shift  3
+                     SEMICOLON shift  22
+
+State 10:
+          expression ::= expression * ADD expression
+          expression ::= expression * SUB expression
+      (7) expression ::= expression SUB expression *
+          expression ::= expression * MULT expression
+          expression ::= expression * DIV expression
+          expression ::= expression * MOD expression
+
+                          MULT shift  5
+                           DIV shift  4
+                           MOD shift  3
+                     {default} reduce 7
+
+State 11:
+          expression ::= expression * ADD expression
+      (6) expression ::= expression ADD expression *
+          expression ::= expression * SUB expression
+          expression ::= expression * MULT expression
+          expression ::= expression * DIV expression
+          expression ::= expression * MOD expression
+
+                          MULT shift  5
+                           DIV shift  4
+                           MOD shift  3
+                     {default} reduce 6
+
+State 12:
+          assignment ::= IDENTIFIER * EQUALS expression SEMICOLON
+     (14) literal ::= IDENTIFIER *
+
+                        EQUALS shift  2
+                     {default} reduce 14
+
+State 13:
+      (2) statements ::= statement *
+
+                     {default} reduce 2
+
+State 14:
+      (5) assignment ::= IDENTIFIER EQUALS expression SEMICOLON *
+
+                     {default} reduce 5
+
+State 15:
+     (14) literal ::= IDENTIFIER *
+
+                     {default} reduce 14
+
+State 16:
+     (13) literal ::= DOUBLE *
+
+                     {default} reduce 13
+
+State 17:
+     (12) literal ::= INTEGER *
+
+                     {default} reduce 12
+
+State 18:
+     (11) expression ::= literal *
+
+                     {default} reduce 11
+
+State 19:
+          expression ::= expression * ADD expression
+          expression ::= expression * SUB expression
+          expression ::= expression * MULT expression
+          expression ::= expression * DIV expression
+          expression ::= expression * MOD expression
+     (10) expression ::= expression MOD expression *
+
+                     {default} reduce 10
+
+State 20:
+          expression ::= expression * ADD expression
+          expression ::= expression * SUB expression
+          expression ::= expression * MULT expression
+          expression ::= expression * DIV expression
+      (9) expression ::= expression DIV expression *
+          expression ::= expression * MOD expression
+
+                     {default} reduce 9
+
+State 21:
+          expression ::= expression * ADD expression
+          expression ::= expression * SUB expression
+          expression ::= expression * MULT expression
+      (8) expression ::= expression MULT expression *
+          expression ::= expression * DIV expression
+          expression ::= expression * MOD expression
+
+                     {default} reduce 8
+
+State 22:
+      (4) statement ::= expression SEMICOLON *
+
+                     {default} reduce 4
+
+State 23:
+      (3) statement ::= assignment *
+
+                     {default} reduce 3
+
+State 24:
+      (1) statements ::= statements statement *
+
+                     {default} reduce 1
+
+----------------------------------------------------
+Symbols:
+    0: $:
+    1: EQUALS
+    2: ADD
+    3: SUB
+    4: MULT
+    5: DIV
+    6: MOD
+    7: SEMICOLON
+    8: IDENTIFIER
+    9: INTEGER
+   10: DOUBLE
+   11: error:
+   12: program: IDENTIFIER INTEGER DOUBLE
+   13: statements: IDENTIFIER INTEGER DOUBLE
+   14: statement: IDENTIFIER INTEGER DOUBLE
+   15: assignment: IDENTIFIER
+   16: expression: IDENTIFIER INTEGER DOUBLE
+   17: literal: IDENTIFIER INTEGER DOUBLE
