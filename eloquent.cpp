@@ -101,8 +101,8 @@ int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr
         delete symbols;
     }
 }
-
-void manual() {
+ 
+int main() {
     void *parser = ParseAlloc(malloc);
     Node *AST = nullptr;
 
@@ -226,51 +226,5 @@ void manual() {
     assert(*evaluate(AST) == (15 * 30 - (15*30)));
 
     ParseFree(parser, free);
-}
-
-/*
-void parse(const string& commandLine) {
-    // Set up the scanner
-    yyscan_t scanner;
-    yylex_init(&scanner);
-    YY_BUFFER_STATE bufferState = yy_scan_string(commandLine.c_str(), scanner);
- 
-    // Set up the parser
-    void *shellParser = ParseAlloc(malloc);
- 
-    int lexCode;
-    bool validParse = true;
-    do {
-        lexCode = yylex(scanner);
-        std::cout << "Lexed: " << yyget_text(scanner) << std::endl;
-        Parse(shellParser, lexCode, yyget_text(scanner), &validParse);
-    }
-    while (lexCode > 0 && validParse);
- 
-    if (-1 == lexCode) {
-        cerr << "The scanner encountered an error.\n";
-    }
-
-    if (!validParse) {
-        cerr << "The parser encountered an error.\n";
-    }
- 
-    // Cleanup the scanner and parser
-    yy_delete_buffer(bufferState, scanner);
-    yylex_destroy(scanner);
-    ParseFree(shellParser, free);
-}
-*/
- 
-int main() {
-    manual();
-
     return 0;
-    /*
-    string commandLine;
-    while (getline(cin, commandLine)) {
-        parse(commandLine);
-    }
-    return 0;
-    */
 }
