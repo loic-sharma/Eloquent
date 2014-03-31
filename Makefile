@@ -22,7 +22,7 @@ lexer:
 	flex --outfile=lexer.yy.cpp --header-file=lexer.yy.h lexer.l
 
 parser:
-	./lemon parser.y -s
+	lemon parser.y -s
 	mv parser.c parser.cpp
 
 clean:

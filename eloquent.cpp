@@ -1,62 +1,174 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <cassert>
+#include "ast.h"
 #include "parser.h"
 #include "lexer.yy.h"
-using namespace std;
- 
+
 void* ParseAlloc(void* (*allocProc)(size_t));
-void Parse(void* parser, int token, const char *tokenInfo);
+void Parse(void* parser, int token, const char *tokenInfo, Node **ast);
 void ParseFree(void* parser, void(*freeProc)(void*));
+
+#include <unordered_map>
+
+int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr) {
+    if (ast == nullptr) return nullptr;
+
+    if (symbols == nullptr) {
+        symbols = new std::unordered_map<std::string, int>;
+    }
+
+    std::string value(ast->value);
+
+    if (value == "=") {
+        (*symbols)[ast->left->value] = *evaluate(ast->right, symbols);
+
+        return nullptr;
+    }
+    else {
+        int *left = (ast->left) ? evaluate(ast->left, symbols) : nullptr;
+        int *right = (ast->right) ? evaluate(ast->right, symbols) : nullptr;
+
+        if (value == "*") {
+            return new int(*left * *right);
+        }
+        else if (value == "/") {
+            return new int(*left / *right);
+        }
+        else if (value == "+") {
+            return new int(*left + *right);
+        }
+        else if (value == "-") {
+            return new int(*left - *right);
+        }
+        else if (value == "%") {
+            return new int(*left % *right);   
+        }
+        else if (value == "__compound") {
+            evaluate(ast->left);
+
+            return evaluate(ast->right);
+        }
+        else {
+            if (ast->value and (*ast->value >= '0' and *ast->value <= '9')) {
+                return new int(atoi(ast->value));
+            }
+            else {
+                return new int((*symbols)[ast->value]);
+            }
+        }
+    }
+}
 
 void manual() {
     void *parser = ParseAlloc(malloc);
+    Node *AST = nullptr;
 
-    Parse(parser, INTEGER, "15");
-    Parse(parser, SEMICOLON, ";");
-    Parse(parser, 0, 0);
+    Parse(parser, INTEGER, "15", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, 0, 0, &AST);
 
-    std::cout << "---------------------\n";
+    assert(AST->value == "15");
+    assert(AST->left == nullptr);
+    assert(AST->right == nullptr);
 
-    Parse(parser, INTEGER, "15");
-    Parse(parser, ADD, "+");
-    Parse(parser, INTEGER, "20");
-    Parse(parser, MULT, "*");
-    Parse(parser, INTEGER, "5");
-    Parse(parser, SEMICOLON, ";");
-    Parse(parser, 0, 0);
+    assert(*evaluate(AST) == 15);
 
     std::cout << "---------------------\n";
 
-    Parse(parser, IDENTIFIER, "a");
-    Parse(parser, EQUALS, "=");
-    Parse(parser, INTEGER, "15");
-    Parse(parser, ADD, "+");
-    Parse(parser, INTEGER, "20");
-    Parse(parser, MULT, "*");
-    Parse(parser, INTEGER, "5");
-    Parse(parser, SEMICOLON, ";");
-    Parse(parser, 0, 0);
+    Parse(parser, INTEGER, "15", &AST);
+    Parse(parser, ADD, "+", &AST);
+    Parse(parser, INTEGER, "20", &AST);
+    Parse(parser, MULT, "*", &AST);
+    Parse(parser, INTEGER, "5", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, 0, 0, &AST);
+
+    assert(AST->value == "+");
+    assert(AST->left->value == "15");
+    assert(AST->right->value == "*");
+    assert(AST->right->left->value == "20");
+    assert(AST->right->right->value == "5"); 
+    assert(AST->right->left->left == nullptr);
+    assert(AST->right->left->right == nullptr);
+    assert(AST->right->right->left == nullptr);
+    assert(AST->right->right->right == nullptr);
+
+    assert(*evaluate(AST) == 115);
 
     std::cout << "---------------------\n";
 
-    Parse(parser, IDENTIFIER, "a");
-    Parse(parser, EQUALS, "=");
-    Parse(parser, INTEGER, "15");
-    Parse(parser, SEMICOLON, ";");
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, ASSIGN, "=", &AST);
+    Parse(parser, INTEGER, "15", &AST);
+    Parse(parser, ADD, "+", &AST);
+    Parse(parser, INTEGER, "20", &AST);
+    Parse(parser, MULT, "*", &AST);
+    Parse(parser, INTEGER, "5", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, 0, 0, &AST);
 
-    Parse(parser, IDENTIFIER, "b");
-    Parse(parser, EQUALS, "=");
-    Parse(parser, INTEGER, "30");
-    Parse(parser, SEMICOLON, ";");
+    assert(AST->value == "=");
+    assert(AST->left->value == "a");
+    assert(AST->right->value == "+");
+    assert(AST->right->left->value == "15");
+    assert(AST->right->right->value == "*");
+    assert(AST->right->right->left->value == "20");
+    assert(AST->right->right->right->value == "5");
+
+    assert(evaluate(AST) == nullptr);    
+
+    std::cout << "---------------------\n";
+
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, ASSIGN, "=", &AST);
+    Parse(parser, INTEGER, "15", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+
+    Parse(parser, IDENTIFIER, "b", &AST);
+    Parse(parser, ASSIGN, "=", &AST);
+    Parse(parser, INTEGER, "30", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
     
-    Parse(parser, IDENTIFIER, "c");
-    Parse(parser, EQUALS, "=");
-    Parse(parser, IDENTIFIER, "a");
-    Parse(parser, MULT, "*");
-    Parse(parser, IDENTIFIER, "b");
-    Parse(parser, SEMICOLON, ";");
-    Parse(parser, 0, 0);
+    Parse(parser, IDENTIFIER, "c", &AST);
+    Parse(parser, ASSIGN, "=", &AST);
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, MULT, "*", &AST);
+    Parse(parser, IDENTIFIER, "b", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, 0, 0, &AST);
+
+    assert(evaluate(AST) == nullptr);
+
+    std::cout << "---------------------\n";
+
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, ASSIGN, "=", &AST);
+    Parse(parser, INTEGER, "15", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+
+    Parse(parser, IDENTIFIER, "b", &AST);
+    Parse(parser, ASSIGN, "=", &AST);
+    Parse(parser, INTEGER, "30", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    
+    Parse(parser, IDENTIFIER, "c", &AST);
+    Parse(parser, ASSIGN, "=", &AST);
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, MULT, "*", &AST);
+    Parse(parser, IDENTIFIER, "b", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, MULT, "*", &AST);
+    Parse(parser, IDENTIFIER, "b", &AST);
+    Parse(parser, MULT, "-", &AST);
+    Parse(parser, IDENTIFIER, "c", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, 0, 0, &AST);
+
+    assert(*evaluate(AST) == (15 * 30 - (15*30)));
 
     ParseFree(parser, free);
 }

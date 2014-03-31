@@ -11,12 +11,17 @@
 
 %%
 
-"="    {return EQUALS;}
+"=="   {return EQUALS;}
+"="    {return ASSIGN;}
 "+"    {return ADD;}
 "-"    {return SUB;}
 "*"    {return MULT;}
 "/"    {return DIV;}
 "%"    {return MOD;}
+"{"    {return LBRACE;}
+"}"    {return RBRACE;}
+
+"if"     {return IF;}
 
 [ \t\r\n]    {}
 

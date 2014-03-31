@@ -11,30 +11,69 @@
 	std::cout << "ERROR!\n";
 }
 
-%token_type {const char *}
-%default_type {const char *}
-%extra_argument {AST **}
+%extra_argument {Node **AST}
 
+%token_type {const char *}
+%default_type {Node *}
+
+%right ASSIGN.
 %right EQUALS.
 %left ADD SUB.
 %left MULT DIV MOD.
 
-program ::= statements.
-statements ::= statements statement.
-statements ::= statement.
+program ::= statements(A). {*AST = A;}
 
-statement ::= assignment.
-statement ::= expression SEMICOLON.
+statements(A) ::= statements(B) statement(C).   {A = new CompoundNode(B, C); }
+statements(A) ::= statement(B).                 {A = B;}
 
-assignment ::= IDENTIFIER(B) EQUALS expression(C) SEMICOLON. {std::cout << B << " = " << C << std::endl;}
+statement(A) ::= assignment(B).           {A = B;}
+statement(A) ::= conditional(B).          {A = B;}
+statement(A) ::= expression(B) SEMICOLON. {A = B;}
 
-expression(A) ::= expression(B) ADD expression(C). {std::cout << B << "+" << C << std::endl; A = std::to_string(std::atoi(B) + std::atoi(C)).c_str();}
-expression(A) ::= expression(B) SUB expression(C). {std::cout << B << "-" << C << std::endl; A = std::to_string(std::atoi(B) - std::atoi(C)).c_str();}
-expression(A) ::= expression(B) MULT expression(C). {std::cout << B << "*" << C << std::endl;A = std::to_string(std::atoi(B) * std::atoi(C)).c_str();}
-expression(A) ::= expression(B) DIV expression(C). {std::cout << B << "/" << C << std::endl;A = std::to_string(std::atoi(B) / std::atoi(C)).c_str();}
-expression(A) ::= expression(B) MOD expression(C). {std::cout << B << "%" << C << std::endl;A = std::to_string(std::atoi(B) % std::atoi(C)).c_str();}
-expression(A) ::= literal(B). {A = B;}
+assignment(A) ::= identifier(B) ASSIGN expression(C) SEMICOLON. {
+	A = new Node("=", B, C);
+}
 
-literal(A) ::= INTEGER(B). {std::cout << "Integer: " << B << std::endl; A = B;}
-literal(A) ::= DOUBLE(B). {std::cout << "Double: " << B << std::endl; A = B;}
-literal(A) ::= IDENTIFIER(B). {std::cout << "Identifier: " << B << std::endl; A = B;}
+conditional(A) ::= IF expression(B) block(C). {
+	A = new Node("__conditional", B, C);
+}
+
+block(A) ::= LBRACE statements(B) RBRACE. {
+	A = B;
+}
+
+expression(A) ::= expression(B) ADD expression(C). {
+	A = new Node("+", B, C);
+}
+expression(A) ::= expression(B) SUB expression(C). {
+	A = new Node("-", B, C);
+}
+expression(A) ::= expression(B) MULT expression(C). {
+	A = new Node("*", B, C);
+}
+expression(A) ::= expression(B) DIV expression(C). {
+	A = new Node("/", B, C);
+}
+expression(A) ::= expression(B) MOD expression(C). {
+	A = new Node("%", B, C);
+}
+expression(A) ::= expression(B) EQUALS expression(C). {
+	A = new Node("==", B, C);
+}
+expression(A) ::= literal(B). {
+	A = B;
+}
+
+literal(A) ::= INTEGER(B). {
+	A = new Node(B);
+}
+literal(A) ::= DOUBLE(B). {
+	A = new Node(B);
+}
+literal(A) ::= identifier(B). {
+	A = B;
+}
+
+identifier(A) ::= IDENTIFIER(B). {
+	A = new Node(B);
+}
