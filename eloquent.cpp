@@ -86,7 +86,13 @@ int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr
                 return new int(atoi(ast->value));
             }
             else {
-                return new int((*symbols)[ast->value]);
+                if (symbols->find(ast->value) != symbols->end()) {
+                    return new int((*symbols)[ast->value]);
+                }
+                else {
+                    std::cerr << "Variable '" << ast->value << "' does not exist." << std::endl;
+                    exit(1);
+                }
             }
         }
     }
