@@ -15,40 +15,71 @@ void ParseFree(void* parser, void(*freeProc)(void*));
 int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr) {
     if (ast == nullptr) return nullptr;
 
+    bool own_symbols = false;
+
     if (symbols == nullptr) {
         symbols = new std::unordered_map<std::string, int>;
+
+        own_symbols = true;
     }
 
     std::string value(ast->value);
 
     if (value == "=") {
-        (*symbols)[ast->left->value] = *evaluate(ast->right, symbols);
+        if (ast->left and ast->right) {
+            int *value = evaluate(ast->right, symbols);
 
-        return nullptr;
+            if (value) {
+                (*symbols)[ast->left->value] = *value;
+            }
+            else {
+                std::cerr << "Value is a null pointer." << std::endl;
+                exit(1);
+            }
+
+            return nullptr;
+        }
+        else {
+            std::cerr << "No left or right child for assignment." << std::endl;
+            exit(1);
+        }
     }
     else {
-        int *left = (ast->left) ? evaluate(ast->left, symbols) : nullptr;
-        int *right = (ast->right) ? evaluate(ast->right, symbols) : nullptr;
+        int left, right;
+        int *left_ptr = evaluate(ast->left, symbols);
+        int *right_ptr = evaluate(ast->right, symbols);
+
+        if (left_ptr) {
+            left = *left_ptr;
+
+            delete left_ptr;
+        }
+
+        if (right_ptr) {
+            right = *right_ptr;
+
+            delete right_ptr;
+        }
 
         if (value == "*") {
-            return new int(*left * *right);
+            return new int(left * right);
         }
         else if (value == "/") {
-            return new int(*left / *right);
+            return new int(left / right);
         }
         else if (value == "+") {
-            return new int(*left + *right);
+            return new int(left + right);
         }
         else if (value == "-") {
-            return new int(*left - *right);
+            return new int(left - right);
         }
         else if (value == "%") {
-            return new int(*left % *right);   
+            return new int(left % right);   
         }
         else if (value == "__compound") {
-            evaluate(ast->left);
+            int *output = (right_ptr) ? new int(right) : nullptr;
 
-            return evaluate(ast->right);
+            return output;
         }
         else {
             if (ast->value and (*ast->value >= '0' and *ast->value <= '9')) {
@@ -58,6 +89,10 @@ int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr
                 return new int((*symbols)[ast->value]);
             }
         }
+    }
+
+    if (own_symbols) {
+        delete symbols;
     }
 }
 
