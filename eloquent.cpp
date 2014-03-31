@@ -163,7 +163,7 @@ void manual() {
     Parse(parser, IDENTIFIER, "a", &AST);
     Parse(parser, MULT, "*", &AST);
     Parse(parser, IDENTIFIER, "b", &AST);
-    Parse(parser, MULT, "-", &AST);
+    Parse(parser, SUB, "-", &AST);
     Parse(parser, IDENTIFIER, "c", &AST);
     Parse(parser, SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
