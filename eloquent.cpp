@@ -139,6 +139,20 @@ void manual() {
     Parse(parser, SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
+    assert(AST->value == "__compound");
+    assert(AST->left->value == "__compound");
+    assert(AST->right->value == "=");
+    assert(AST->left->left->value == "=");
+    assert(AST->left->right->value == "=");
+    assert(AST->right->left->value == "c");
+    assert(AST->right->right->value == "*");
+    assert(AST->left->left->left->value == "a");
+    assert(AST->left->left->right->value == "15");
+    assert(AST->left->right->left->value == "b");
+    assert(AST->left->right->right->value == "30");
+    assert(AST->right->right->left->value == "a");
+    assert(AST->right->right->right->value == "b");
+
     assert(evaluate(AST) == nullptr);
 
     std::cout << "---------------------\n";
