@@ -5,7 +5,6 @@
 
 #include "ast.h"
 #include "parser.h"
-#include "lexer.yy.h"
 #include "virtual_machine.h"
 
 void *ParseAlloc(void* (*allocProc)(size_t));
