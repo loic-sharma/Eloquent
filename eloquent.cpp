@@ -2,9 +2,11 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+
 #include "ast.h"
 #include "parser.h"
 #include "lexer.yy.h"
+#include "virtual_machine.h"
 
 void *ParseAlloc(void* (*allocProc)(size_t));
 void Parse(void* parser, int token, const char *tokenInfo, Node **ast);
@@ -14,206 +16,9 @@ void ParseFree(void* parser, void(*freeProc)(void*));
 #include <vector>
 #include <stack>
 
-struct Function {
-    std::string name;
-    std::vector<std::string> parameters;
-    Node *content;
-};
-
-typedef std::unordered_map<std::string, int> Symbols;
-typedef std::unordered_map<std::string, Function> Functions;
-
-int *evaluate(Node *ast, Symbols *symbols = nullptr, Functions *functions = nullptr) {
-    if (ast == nullptr) return nullptr;
-
-    bool own_symbols = false, own_functions = false;
-
-    if (symbols == nullptr) {
-        symbols = new Symbols;
-
-        own_symbols = true;
-    }
-
-    if (functions == nullptr) {
-        functions = new Functions;
-
-        own_functions = true;
-    }
-
-    std::string value(ast->value);
-
-    if (value == "__print") {
-        int *expression = evaluate(ast->left);
-
-        if (expression == nullptr) {
-            std::cerr << "Nothing to print." << std::endl;
-            exit(1);
-        }
-
-        std::cout << *expression << std::endl;
-        return nullptr;
-    }
-    else if (value == "__function") {
-        if (ast->right == nullptr) {
-            return nullptr;
-        }
-        else if(ast->left == nullptr or ast->left->left == nullptr) {
-            std::cerr << "Function has invalid prototype" << std::endl;
-            exit(1);
-        }
-        else {
-            std::vector<std::string> parameters;
-            std::stack<Node *> nodes;
-
-            nodes.push(ast->left->right);
-
-            while (nodes.empty() == false) {
-                Node *current = nodes.top();
-
-                if (current->value[0] == ',') {
-                    nodes.pop();
-
-                    if (current->right) nodes.push(current->right);
-                    if (current->left) nodes.push(current->left);
-                }
-                else {
-                    parameters.push_back(current->value);
-
-                    nodes.pop();
-                }
-            }
-
-            Function function = {ast->left->left->value, parameters, ast->right};
-
-            (*functions)[function.name] = function;
-        }
-
-        return nullptr;
-    }
-    else if (value == "__call") {
-        auto it = functions->find(ast->left->value);
-
-        if (it == functions->end()) {
-            std::cerr << "Invalid function '" << ast->left->value << "'" << std::endl;
-            exit(1);
-        }
-
-        Symbols *parameters = new Symbols;
-        unsigned parameter_count = 0;
-
-        std::stack<Node *> nodes;
-
-        nodes.push(ast->right);
-
-        while (nodes.empty() == false) {
-            Node *current = nodes.top();
-
-            if (current->value[0] == ',') {
-                nodes.pop();
-
-                if (current->right) nodes.push(current->right);
-                if (current->left) nodes.push(current->left);
-            }
-            else {
-                std::string name(it->second.parameters[parameter_count++]);
-
-                (*parameters)[name] = atoi(current->value);
-
-                nodes.pop();
-            }
-        }
-
-        int *result = evaluate(it->second.content, parameters, functions);
-
-        delete parameters;
-
-        return result;
-    }
-    else if(value == "__return") {
-        return evaluate(ast->left, symbols, functions);
-    }
-    else if (value == "=") {
-        if (ast->left and ast->right) {
-            int *value = evaluate(ast->right, symbols, functions);
-
-            if (value) {
-                (*symbols)[ast->left->value] = *value;
-            }
-            else {
-                std::cerr << "Value is a null pointer." << std::endl;
-                exit(1);
-            }
-
-            return nullptr;
-        }
-        else {
-            std::cerr << "No left or right child for assignment." << std::endl;
-            exit(1);
-        }
-    }
-    else {
-        int left, right;
-        int *left_ptr = evaluate(ast->left, symbols, functions);
-        int *right_ptr = evaluate(ast->right, symbols, functions);
-
-        if (left_ptr) {
-            left = *left_ptr;
-
-            delete left_ptr;
-        }
-
-        if (right_ptr) {
-            right = *right_ptr;
-
-            delete right_ptr;
-        }
-
-        if (value == "*") {
-            return new int(left * right);
-        }
-        else if (value == "/") {
-            return new int(left / right);
-        }
-        else if (value == "+") {
-            return new int(left + right);
-        }
-        else if (value == "-") {
-            return new int(left - right);
-        }
-        else if (value == "%") {
-            return new int(left % right);   
-        }
-        else if (value == "__compound") {
-            int *output = (right_ptr) ? new int(right) : nullptr;
-
-            return output;
-        }
-        else {
-            if (ast->value and (*ast->value >= '0' and *ast->value <= '9')) {
-                return new int(atoi(ast->value));
-            }
-            else {
-                if (symbols->find(ast->value) != symbols->end()) {
-                    return new int((*symbols)[ast->value]);
-                }
-                else {
-                    std::cerr << "Variable '" << ast->value << "' does not exist." << std::endl;
-                    exit(1);
-                }
-            }
-        }
-    }
-
-    if (own_symbols) {
-        delete symbols;
-    }
-
-    if (own_functions) {
-        delete functions;
-    }
-}
-
 int main() {
+    VirtualMachine vm;
+
     void *parser = ParseAlloc(malloc);
     Node *AST = nullptr;
 
@@ -222,8 +27,9 @@ int main() {
     Parse(parser, SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
-    evaluate(AST);
+    vm.execute(AST);
 
+    /*
     //////////////////////////////////////////
 
     Parse(parser, INTEGER, "15", &AST);
@@ -396,7 +202,7 @@ int main() {
     assert(AST->right->right->right->value == "0");
 
     assert(*evaluate(AST) == 14);
-
+    */
     ParseFree(parser, free);
 
     return 0;
