@@ -11,23 +11,115 @@ void Parse(void* parser, int token, const char *tokenInfo, Node **ast);
 void ParseFree(void* parser, void(*freeProc)(void*));
 
 #include <unordered_map>
+#include <vector>
+#include <stack>
 
-int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr) {
+struct Function {
+    std::string name;
+    std::vector<std::string> parameters;
+    Node *content;
+};
+
+typedef std::unordered_map<std::string, int> Symbols;
+typedef std::unordered_map<std::string, Function> Functions;
+
+int *evaluate(Node *ast, Symbols *symbols = nullptr, Functions *functions = nullptr) {
     if (ast == nullptr) return nullptr;
 
-    bool own_symbols = false;
+    bool own_symbols = false, own_functions = false;
 
     if (symbols == nullptr) {
-        symbols = new std::unordered_map<std::string, int>;
+        symbols = new Symbols;
 
         own_symbols = true;
     }
 
+    if (functions == nullptr) {
+        functions = new Functions;
+
+        own_functions = true;
+    }
+
     std::string value(ast->value);
 
-    if (value == "=") {
+    if (value == "__function") {
+        if (ast->right == nullptr) {
+            return nullptr;
+        }
+        else if(ast->left == nullptr or ast->left->left == nullptr) {
+            std::cerr << "Function has invalid prototype" << std::endl;
+            exit(1);
+        }
+        else {
+            std::vector<std::string> parameters;
+            std::stack<Node *> nodes;
+
+            nodes.push(ast->left->right);
+
+            while (nodes.empty() == false) {
+                Node *current = nodes.top();
+
+                if (current->value[0] == ',') {
+                    if (current->right) nodes.push(current->right);
+                    if (current->left) nodes.push(current->left);
+                }
+                else {
+                    parameters.push_back(current->value);
+
+                    nodes.pop();
+                }
+            }
+
+            Function function = {ast->left->left->value, parameters, ast->right};
+
+            (*functions)[function.name] = function;
+        }
+
+        return nullptr;
+    }
+    else if (value == "__call") {
+        auto it = functions->find(ast->left->value);
+
+        if (it == functions->end()) {
+            std::cerr << "Invalid function '" << ast->left->value << "'" << std::endl;
+            exit(1);
+        }
+
+        Symbols *parameters = new Symbols;
+        unsigned parameter_count = 0;
+
+        std::stack<Node *> nodes;
+
+        nodes.push(ast->right);
+
+        while (nodes.empty() == false) {
+            Node *current = nodes.top();
+
+            if (current->value[0] == ',') {
+                if (current->right) nodes.push(current->right);
+                if (current->left) nodes.push(current->left);
+            }
+            else {
+                std::string name(it->second.parameters[parameter_count++]);
+
+                (*parameters)[name] = atoi(current->value);
+
+                nodes.pop();
+            }
+        }
+
+        int *result = evaluate(it->second.content, parameters, functions);
+
+        delete parameters;
+
+        return result;
+    }
+    else if(value == "__return") {
+        return evaluate(ast->left, symbols, functions);
+    }
+    else if (value == "=") {
         if (ast->left and ast->right) {
-            int *value = evaluate(ast->right, symbols);
+            int *value = evaluate(ast->right, symbols, functions);
 
             if (value) {
                 (*symbols)[ast->left->value] = *value;
@@ -46,8 +138,8 @@ int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr
     }
     else {
         int left, right;
-        int *left_ptr = evaluate(ast->left, symbols);
-        int *right_ptr = evaluate(ast->right, symbols);
+        int *left_ptr = evaluate(ast->left, symbols, functions);
+        int *right_ptr = evaluate(ast->right, symbols, functions);
 
         if (left_ptr) {
             left = *left_ptr;
@@ -100,8 +192,12 @@ int *evaluate(Node *ast, std::unordered_map<std::string, int> *symbols = nullptr
     if (own_symbols) {
         delete symbols;
     }
+
+    if (own_functions) {
+        delete functions;
+    }
 }
- 
+
 int main() {
     void *parser = ParseAlloc(malloc);
     Node *AST = nullptr;
@@ -225,6 +321,53 @@ int main() {
 
     assert(*evaluate(AST) == (15 * 30 - (15*30)));
 
+    std::cout << "---------------------\n";
+
+
+    Parse(parser, FUNCTION, "function", &AST);
+    Parse(parser, IDENTIFIER, "double", &AST);
+    Parse(parser, LPAREN, "(", &AST);
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, RPAREN, ")", &AST);
+    Parse(parser, LBRACE, "{", &AST);
+    Parse(parser, RETURN, "return", &AST);
+    Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, MULT, "*", &AST);
+    Parse(parser, INTEGER, "2", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, RBRACE, "}", &AST);
+
+    Parse(parser, IDENTIFIER, "double", &AST);
+    Parse(parser, LPAREN, "(", &AST);
+    Parse(parser, INTEGER, "7", &AST);
+    Parse(parser, RPAREN, ")", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, 0, 0, &AST);
+
+    assert(AST);
+    assert(AST->left);
+    assert(AST->right);
+    assert(AST->value == "__compound");
+    assert(AST->left->value == "__function");
+
+    assert(AST->left->left->value == "__prototype");
+    assert(AST->left->left->left->value == "double");
+    assert(AST->left->left->right->value == "a");
+    assert(AST->left->left->right->left == nullptr);
+    assert(AST->left->left->right->right == nullptr);
+
+    assert(AST->left->right->value == "__return");
+    assert(AST->left->right->left->value == "*");
+    assert(AST->left->right->left->left->value == "a");
+    assert(AST->left->right->left->right->value == "2");
+
+    assert(AST->right->value == "__call");
+    assert(AST->right->left->value == "double");
+    assert(AST->right->right->value == "7");
+
+    assert(*evaluate(AST) == 14);
+
     ParseFree(parser, free);
+
     return 0;
 }
