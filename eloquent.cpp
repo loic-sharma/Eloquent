@@ -7,9 +7,9 @@
 #include "parser.h"
 #include "virtual_machine.h"
 
-void *ParseAlloc(void* (*allocProc)(size_t));
-void Parse(void* parser, int token, const char *tokenInfo, Node **ast);
-void ParseFree(void* parser, void(*freeProc)(void*));
+void *ParseAlloc(void *(*allocProc)(size_t));
+void Parse(void *parser, int token, const char *tokenInfo, Node **ast);
+void ParseFree(void *parser, void(*freeProc)(void *));
 
 int main() {
     VirtualMachine vm;
@@ -34,8 +34,6 @@ int main() {
     assert(AST->left == nullptr);
     assert(AST->right == nullptr);
 
-    // assert(*evaluate(AST) == 15);
-
     vm.execute(AST);
 
     //////////////////////////////////////////
@@ -58,8 +56,6 @@ int main() {
     assert(AST->right->right->left == nullptr);
     assert(AST->right->right->right == nullptr);
 
-    // assert(*evaluate(AST) == 115);
-
     vm.execute(AST);
 
     //////////////////////////////////////////
@@ -81,8 +77,6 @@ int main() {
     assert(AST->right->right->value == "*");
     assert(AST->right->right->left->value == "20");
     assert(AST->right->right->right->value == "5");
-
-    // assert(evaluate(AST) == nullptr);
 
     vm.execute(AST);   
 
@@ -120,8 +114,6 @@ int main() {
     assert(AST->right->right->left->value == "a");
     assert(AST->right->right->right->value == "b");
 
-    // assert(evaluate(AST) == nullptr);
-
     vm.execute(AST);
 
     //////////////////////////////////////////
@@ -150,8 +142,6 @@ int main() {
     Parse(parser, IDENTIFIER, "c", &AST);
     Parse(parser, SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
-
-    // assert(*evaluate(AST) == (15 * 30 - (15*30)));
 
     vm.execute(AST);
 
@@ -205,7 +195,6 @@ int main() {
     assert(AST->right->right->left->value == "7");
     assert(AST->right->right->right->value == "0");
 
-    // assert(*evaluate(AST) == 14);
     vm.execute(AST);
 
     ParseFree(parser, free);
