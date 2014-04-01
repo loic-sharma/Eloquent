@@ -24,7 +24,6 @@ int main() {
 
     vm.execute(AST);
 
-    /*
     //////////////////////////////////////////
 
     Parse(parser, INTEGER, "15", &AST);
@@ -35,7 +34,9 @@ int main() {
     assert(AST->left == nullptr);
     assert(AST->right == nullptr);
 
-    assert(*evaluate(AST) == 15);
+    // assert(*evaluate(AST) == 15);
+
+    vm.execute(AST);
 
     //////////////////////////////////////////
 
@@ -57,7 +58,9 @@ int main() {
     assert(AST->right->right->left == nullptr);
     assert(AST->right->right->right == nullptr);
 
-    assert(*evaluate(AST) == 115);
+    // assert(*evaluate(AST) == 115);
+
+    vm.execute(AST);
 
     //////////////////////////////////////////
 
@@ -79,7 +82,9 @@ int main() {
     assert(AST->right->right->left->value == "20");
     assert(AST->right->right->right->value == "5");
 
-    assert(evaluate(AST) == nullptr);    
+    // assert(evaluate(AST) == nullptr);
+
+    vm.execute(AST);   
 
     //////////////////////////////////////////
 
@@ -115,7 +120,9 @@ int main() {
     assert(AST->right->right->left->value == "a");
     assert(AST->right->right->right->value == "b");
 
-    assert(evaluate(AST) == nullptr);
+    // assert(evaluate(AST) == nullptr);
+
+    vm.execute(AST);
 
     //////////////////////////////////////////
 
@@ -144,7 +151,9 @@ int main() {
     Parse(parser, SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
-    assert(*evaluate(AST) == (15 * 30 - (15*30)));
+    // assert(*evaluate(AST) == (15 * 30 - (15*30)));
+
+    vm.execute(AST);
 
     //////////////////////////////////////////
 
@@ -196,8 +205,9 @@ int main() {
     assert(AST->right->right->left->value == "7");
     assert(AST->right->right->right->value == "0");
 
-    assert(*evaluate(AST) == 14);
-    */
+    // assert(*evaluate(AST) == 14);
+    vm.execute(AST);
+
     ParseFree(parser, free);
 
     return 0;
