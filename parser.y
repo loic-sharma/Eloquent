@@ -31,7 +31,8 @@ statements(A) ::= statement(B).                 {A = B;}
 statement(A) ::= function(B).             {A = B;}
 statement(A) ::= assignment(B).           {A = B;}
 statement(A) ::= conditional(B).          {A = B;}
-statement(A) ::= return(B).               {A = B;}
+statement(A) ::= print(B) SEMICOLON.      {A = B;}
+statement(A) ::= return(B) SEMICOLON.     {A = B;}
 statement(A) ::= expression(B) SEMICOLON. {A = B;}
 
 function(A) ::= FUNCTION identifier(B) declaration_parameters(C) block(D). {
@@ -54,9 +55,14 @@ block(A) ::= LBRACE RBRACE. {
 	A = nullptr;
 }
 
-return(A) ::= RETURN expression(B) SEMICOLON. {
-	A = new Node("__return", B);	
+
+print(A) ::= PRINT expression(B). {
+	A = new Node("__print", B);
 }
+
+return(A) ::= RETURN expression(B). {
+	A = new Node("__return", B);	
+} 
 
 expression(A) ::= expression(B) ADD expression(C). {
 	A = new Node("+", B, C);

@@ -42,7 +42,18 @@ int *evaluate(Node *ast, Symbols *symbols = nullptr, Functions *functions = null
 
     std::string value(ast->value);
 
-    if (value == "__function") {
+    if (value == "__print") {
+        int *expression = evaluate(ast->left);
+
+        if (expression == nullptr) {
+            std::cerr << "Nothing to print." << std::endl;
+            exit(1);
+        }
+
+        std::cout << *expression << std::endl;
+        return nullptr;
+    }
+    else if (value == "__function") {
         if (ast->right == nullptr) {
             return nullptr;
         }
@@ -60,6 +71,8 @@ int *evaluate(Node *ast, Symbols *symbols = nullptr, Functions *functions = null
                 Node *current = nodes.top();
 
                 if (current->value[0] == ',') {
+                    nodes.pop();
+
                     if (current->right) nodes.push(current->right);
                     if (current->left) nodes.push(current->left);
                 }
@@ -96,6 +109,8 @@ int *evaluate(Node *ast, Symbols *symbols = nullptr, Functions *functions = null
             Node *current = nodes.top();
 
             if (current->value[0] == ',') {
+                nodes.pop();
+
                 if (current->right) nodes.push(current->right);
                 if (current->left) nodes.push(current->left);
             }
@@ -202,6 +217,15 @@ int main() {
     void *parser = ParseAlloc(malloc);
     Node *AST = nullptr;
 
+    Parse(parser, PRINT, "print", &AST);
+    Parse(parser, INTEGER, "15", &AST);
+    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, 0, 0, &AST);
+
+    evaluate(AST);
+
+    //////////////////////////////////////////
+
     Parse(parser, INTEGER, "15", &AST);
     Parse(parser, SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
@@ -212,7 +236,7 @@ int main() {
 
     assert(*evaluate(AST) == 15);
 
-    std::cout << "---------------------\n";
+    //////////////////////////////////////////
 
     Parse(parser, INTEGER, "15", &AST);
     Parse(parser, ADD, "+", &AST);
@@ -234,7 +258,7 @@ int main() {
 
     assert(*evaluate(AST) == 115);
 
-    std::cout << "---------------------\n";
+    //////////////////////////////////////////
 
     Parse(parser, IDENTIFIER, "a", &AST);
     Parse(parser, ASSIGN, "=", &AST);
@@ -256,7 +280,7 @@ int main() {
 
     assert(evaluate(AST) == nullptr);    
 
-    std::cout << "---------------------\n";
+    //////////////////////////////////////////
 
     Parse(parser, IDENTIFIER, "a", &AST);
     Parse(parser, ASSIGN, "=", &AST);
@@ -292,7 +316,7 @@ int main() {
 
     assert(evaluate(AST) == nullptr);
 
-    std::cout << "---------------------\n";
+    //////////////////////////////////////////
 
     Parse(parser, IDENTIFIER, "a", &AST);
     Parse(parser, ASSIGN, "=", &AST);
@@ -321,13 +345,14 @@ int main() {
 
     assert(*evaluate(AST) == (15 * 30 - (15*30)));
 
-    std::cout << "---------------------\n";
-
+    //////////////////////////////////////////
 
     Parse(parser, FUNCTION, "function", &AST);
     Parse(parser, IDENTIFIER, "double", &AST);
     Parse(parser, LPAREN, "(", &AST);
     Parse(parser, IDENTIFIER, "a", &AST);
+    Parse(parser, COMMA, ",", &AST);
+    Parse(parser, IDENTIFIER, "b", &AST);
     Parse(parser, RPAREN, ")", &AST);
     Parse(parser, LBRACE, "{", &AST);
     Parse(parser, RETURN, "return", &AST);
@@ -340,6 +365,8 @@ int main() {
     Parse(parser, IDENTIFIER, "double", &AST);
     Parse(parser, LPAREN, "(", &AST);
     Parse(parser, INTEGER, "7", &AST);
+    Parse(parser, COMMA, ",", &AST);
+    Parse(parser, INTEGER, "0", &AST);
     Parse(parser, RPAREN, ")", &AST);
     Parse(parser, SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
@@ -352,9 +379,10 @@ int main() {
 
     assert(AST->left->left->value == "__prototype");
     assert(AST->left->left->left->value == "double");
-    assert(AST->left->left->right->value == "a");
-    assert(AST->left->left->right->left == nullptr);
-    assert(AST->left->left->right->right == nullptr);
+
+    assert(AST->left->left->right->value == ",");
+    assert(AST->left->left->right->left->value == "a");
+    assert(AST->left->left->right->right->value == "b");
 
     assert(AST->left->right->value == "__return");
     assert(AST->left->right->left->value == "*");
@@ -363,7 +391,9 @@ int main() {
 
     assert(AST->right->value == "__call");
     assert(AST->right->left->value == "double");
-    assert(AST->right->right->value == "7");
+    assert(AST->right->right->value == ",");
+    assert(AST->right->right->left->value == "7");
+    assert(AST->right->right->right->value == "0");
 
     assert(*evaluate(AST) == 14);
 
