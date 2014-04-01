@@ -1,4 +1,3 @@
-
 # Default Flags
 FLAGS = -Wall -Wextra -pedantic -Wvla -std=c++11 -O3
 
@@ -6,11 +5,14 @@ FLAGS = -Wall -Wextra -pedantic -Wvla -std=c++11 -O3
 release:
 release: all
 
-all: parser.o virtual_machine.o eloquent.o
-	g++ $(FLAGS) eloquent.o parser.o virtual_machine.o -o eloquent
+all: lexer.o parser.o virtual_machine.o eloquent.o
+	g++ $(FLAGS) eloquent.o lexer.o parser.o virtual_machine.o -o eloquent
 
-eloquent.o: eloquent.cpp parser
+eloquent.o: eloquent.cpp
 	g++ $(FLAGS) -c eloquent.cpp
+
+lexer.o: lexer.cpp
+	g++ $(FLAGS) -c lexer.cpp 
 
 parser.o: parser
 	g++ -c parser.cpp
