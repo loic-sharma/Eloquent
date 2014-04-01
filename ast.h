@@ -1,7 +1,6 @@
 class Node {
 public:
-	Node(const char *v) : value(v), left(nullptr), right(nullptr) {}
-	Node(const char *v, Node *l, Node *r) : value(v), left(l), right(r) {}
+	Node(const char *v, Node *l = nullptr, Node *r = nullptr) : value(v), left(l), right(r) {}
 
 	const char *value;
 	Node *left;
