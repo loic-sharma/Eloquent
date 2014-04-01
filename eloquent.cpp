@@ -6,7 +6,7 @@
 #include "parser.h"
 #include "lexer.yy.h"
 
-void* ParseAlloc(void* (*allocProc)(size_t));
+void *ParseAlloc(void* (*allocProc)(size_t));
 void Parse(void* parser, int token, const char *tokenInfo, Node **ast);
 void ParseFree(void* parser, void(*freeProc)(void*));
 
