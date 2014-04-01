@@ -11,10 +11,6 @@ void *ParseAlloc(void* (*allocProc)(size_t));
 void Parse(void* parser, int token, const char *tokenInfo, Node **ast);
 void ParseFree(void* parser, void(*freeProc)(void*));
 
-#include <unordered_map>
-#include <vector>
-#include <stack>
-
 int main() {
     VirtualMachine vm;
 
