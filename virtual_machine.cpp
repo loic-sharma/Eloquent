@@ -53,21 +53,23 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 std::vector<std::string> parameters;
                 std::stack<Node *> nodes;
 
-                nodes.push(node->left->right);
+                if (node->left->right) {
+                    nodes.push(node->left->right);
 
-                while (nodes.empty() == false) {
-                    Node *current = nodes.top();
+                    while (nodes.empty() == false) {
+                        Node *current = nodes.top();
 
-                    if (current->type == Node::Separator) {
-                        nodes.pop();
+                        if (current->type == Node::Separator) {
+                            nodes.pop();
 
-                        if (current->right) nodes.push(current->right);
-                        if (current->left) nodes.push(current->left);
-                    }
-                    else {
-                        parameters.push_back(current->value);
+                            if (current->right) nodes.push(current->right);
+                            if (current->left) nodes.push(current->left);
+                        }
+                        else {
+                            parameters.push_back(current->value);
 
-                        nodes.pop();
+                            nodes.pop();
+                        }
                     }
                 }
 
@@ -97,23 +99,25 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
             std::stack<Node *> nodes;
 
-            nodes.push(node->right);
+            if (node->right) {
+                nodes.push(node->right);
 
-            while (nodes.empty() == false) {
-                Node *current = nodes.top();
+                while (nodes.empty() == false) {
+                    Node *current = nodes.top();
 
-                if (current->type == Node::Separator) {
-                    nodes.pop();
+                    if (current->type == Node::Separator) {
+                        nodes.pop();
 
-                    if (current->right) nodes.push(current->right);
-                    if (current->left) nodes.push(current->left);
-                }
-                else {
-                    std::string name(it->second.parameters[parameter_count++]);
+                        if (current->right) nodes.push(current->right);
+                        if (current->left) nodes.push(current->left);
+                    }
+                    else {
+                        std::string name(it->second.parameters[parameter_count++]);
 
-                    (*parameters)[name] = atoi(current->value);
+                        (*parameters)[name] = atoi(current->value);
 
-                    nodes.pop();
+                        nodes.pop();
+                    }
                 }
             }
 

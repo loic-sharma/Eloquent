@@ -1,3 +1,5 @@
-a = 1 + 2;
+function two() {
+	return 2;
+}
 
-print a;
+print two();
