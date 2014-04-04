@@ -26,7 +26,7 @@
 
 program ::= statements(A). {*AST = A;}
 
-statements(A) ::= statements(B) statement(C).   {A = new CompoundNode(B, C); }
+statements(A) ::= statements(B) statement(C).   {A = new Node(Node::Compound, B, C); }
 statements(A) ::= statement(B).                 {A = B;}
 
 statement(A) ::= function(B).             {A = B;}
@@ -37,15 +37,15 @@ statement(A) ::= return(B) SEMICOLON.     {A = B;}
 statement(A) ::= expression(B) SEMICOLON. {A = B;}
 
 function(A) ::= FUNCTION identifier(B) declaration_parameters(C) block(D). {
-	A = new Node("__function", new Node("__prototype", B, C), D);
+	A = new Node(Node::Function, new Node(Node::Prototype, B, C), D);
 }
 
 assignment(A) ::= identifier(B) ASSIGN expression(C) SEMICOLON. {
-	A = new Node("=", B, C);
+	A = new Node(Node::Assign, B, C);
 }
 
 conditional(A) ::= IF expression(B) block(C). {
-	A = new Node("__conditional", B, C);
+	A = new Node(Node::Conditional, B, C);
 }
 
 block(A) ::= LBRACE statements(B) RBRACE. {
@@ -58,30 +58,30 @@ block(A) ::= LBRACE RBRACE. {
 
 
 print(A) ::= PRINT expression(B). {
-	A = new Node("__print", B);
+	A = new Node(Node::Print, B);
 }
 
 return(A) ::= RETURN expression(B). {
-	A = new Node("__return", B);	
+	A = new Node(Node::Return, B);	
 } 
 
 expression(A) ::= expression(B) ADD expression(C). {
-	A = new Node("+", B, C);
+	A = new Node(Node::Add, B, C);
 }
 expression(A) ::= expression(B) SUB expression(C). {
-	A = new Node("-", B, C);
+	A = new Node(Node::Sub, B, C);
 }
 expression(A) ::= expression(B) MULT expression(C). {
-	A = new Node("*", B, C);
+	A = new Node(Node::Mult, B, C);
 }
 expression(A) ::= expression(B) DIV expression(C). {
-	A = new Node("/", B, C);
+	A = new Node(Node::Div, B, C);
 }
 expression(A) ::= expression(B) MOD expression(C). {
-	A = new Node("%", B, C);
+	A = new Node(Node::Mod, B, C);
 }
 expression(A) ::= expression(B) EQUALS expression(C). {
-	A = new Node("==", B, C);
+	A = new Node(Node::Equals, B, C);
 }
 expression(A) ::= function_call(B). {
 	A = B;
@@ -91,7 +91,7 @@ expression(A) ::= literal(B). {
 }
 
 function_call(A) ::= identifier(B) call_parameters(C). {
-	A = new Node("__call", B, C);
+	A = new Node(Node::Call, B, C);
 }
 
 declaration_parameters(A) ::= LPAREN declaration_parameter_list(B) RPAREN. {
@@ -102,7 +102,7 @@ declaration_parameters(A) ::= LPAREN RPAREN. {
 }
 
 declaration_parameter_list(A) ::= declaration_parameter_list(B) COMMA identifier(C). {
-	A = new Node(",", B, C);
+	A = new Node(Node::Separator, B, C);
 }
 declaration_parameter_list(A) ::= identifier(B). {
 	A = B;
@@ -116,7 +116,7 @@ call_parameters(A) ::= LPAREN RPAREN. {
 }
 
 call_parameter_list(A) ::= call_parameter_list(B) COMMA expression(C). {
-	A = new Node(",", B, C);
+	A = new Node(Node::Separator, B, C);
 }
 call_parameter_list(A) ::= expression(B). {
 	A = B;
