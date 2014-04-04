@@ -13,6 +13,7 @@
 typedef struct _LexerSpecial {
     const char *value;
     const TokenType type;
+    const int type;
 } LexerSpecial;
 
 Lexer::Lexer(std::string i)
@@ -62,6 +63,7 @@ void Lexer::skip_whitespace() {
     if (character == nullptr) return;
 
     while (*character == ' ' or *character == '\n') {
+    while (*character == ' ' or *character == '\n' or *character == '\t') {
         if (*character == '\n') {
             ++line;
         }
