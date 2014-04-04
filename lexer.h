@@ -14,10 +14,8 @@
 
 #include <string>
 
-typedef int TokenType;
-
 typedef struct {
-    TokenType type;
+    int type;
     std::string value;
     int line;
 } LexerToken;
@@ -29,7 +27,7 @@ public:
 
     void lex();
     
-    LexerToken current_token;
+    LexerToken token;
     
 private:
     // The input string the Lexer is lexing.

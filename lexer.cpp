@@ -12,7 +12,6 @@
 
 typedef struct _LexerSpecial {
     const char *value;
-    const TokenType type;
     const int type;
 } LexerSpecial;
 
@@ -27,13 +26,13 @@ void Lexer::lex() {
     
     // Are we at the last character?
     if (character == nullptr or *character == '\0') {
-        current_token.type = T_EOF;
-        current_token.value = "";
-        current_token.line = line;
+        token.type = T_EOF;
+        token.value = "";
+        token.line = line;
     }
     
     else {
-        current_token.type = T_UNKNOWN;
+        token.type = T_UNKNOWN;
         
         // Lex numbers (integers as well as doubles).
         if (is_number_start()) {
@@ -52,7 +51,7 @@ void Lexer::lex() {
                     lex_identifier();
                 }
                 else {
-                    current_token.value = *character;
+                    token.value = *character;
                 }
             }
         }
@@ -62,7 +61,6 @@ void Lexer::lex() {
 void Lexer::skip_whitespace() {
     if (character == nullptr) return;
 
-    while (*character == ' ' or *character == '\n') {
     while (*character == ' ' or *character == '\n' or *character == '\t') {
         if (*character == '\n') {
             ++line;
@@ -128,16 +126,17 @@ void Lexer::lex_number() {
         ++end;
     }
 
-    current_token.type = T_INTEGER;
-    current_token.value = std::string(character, end);
-    current_token.line = line;
+    token.type = T_INTEGER;
+    token.value = std::string(character, end);
+    token.line = line;
 
     character = end;
 }
 
 void Lexer::lex_float() {
-    current_token.type = T_DOUBLE;
-    current_token.value = "0.0";
+    token.type = T_DOUBLE;
+    token.value = "0.0";
+    token.line = line;
 }
 
 void Lexer::lex_string() {
@@ -157,9 +156,9 @@ void Lexer::lex_string() {
     // the string that was just lexed.
     character = string_end + 1;
     
-    current_token.type = T_STRING;
-    current_token.value = input.substr(string_start - start, string_end - string_start);
-    current_token.line = line;
+    token.type = T_STRING;
+    token.value = input.substr(string_start - start, string_end - string_start);
+    token.line = line;
 }
 
 bool Lexer::lex_special() {
@@ -169,14 +168,17 @@ bool Lexer::lex_special() {
         {"*", T_MULT},
         {"/", T_DIV},
         {"%", T_MOD},
-        {"=", T_MOD},
+        {"=", T_ASSIGN},
         {";", T_SEMICOLON},
         {"{", T_LBRACE},
         {"}", T_RBRACE},
         {"(", T_LPAREN},
         {")", T_RPAREN},
         
-        {"if", T_IF},/*
+        {"if", T_IF},
+        {"print", T_PRINT},
+        {"function", T_FUNCTION},
+        {"return", T_RETURN},/*
         {"elseif", T_ELSEIF},
         {"else", T_ELSE},
         {"and", T_AND},
@@ -204,9 +206,9 @@ bool Lexer::lex_special() {
         if (same == true) {
             character = current;
             
-            current_token.type = op.type;
-            current_token.value = op.value;
-            current_token.line = line;
+            token.type = op.type;
+            token.value = op.value;
+            token.line = line;
             
             return true;
         }
@@ -228,7 +230,7 @@ void Lexer::lex_identifier() {
     
     character = ident_end;
     
-    current_token.type = T_IDENTIFIER;
-    current_token.value = input.substr(ident_start - start, ident_end - ident_start);
-    current_token.line = line;
+    token.type = T_IDENTIFIER;
+    token.value = input.substr(ident_start - start, ident_end - ident_start);
+    token.line = line;
 }
