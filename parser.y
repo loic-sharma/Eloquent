@@ -128,6 +128,9 @@ literal(A) ::= INTEGER(B). {
 literal(A) ::= DOUBLE(B). {
 	A = new Node(B);
 }
+literal(A) ::= STRING(B). {
+	A = new Node(B);
+}
 literal(A) ::= identifier(B). {
 	A = B;
 }
