@@ -13,6 +13,7 @@
 
 %extra_argument {Node **AST}
 
+%token_prefix T_
 %token_type {const char *}
 %default_type {Node *}
 
