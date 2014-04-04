@@ -11,14 +11,14 @@ all: lexer.o parser.o virtual_machine.o eloquent.o
 eloquent.o: eloquent.cpp
 	g++ $(FLAGS) -c eloquent.cpp
 
-lexer.o: lexer.cpp
+virtual_machine.o: virtual_machine.cpp
+	g++ $(FLAGS) -c virtual_machine.cpp
+
+lexer.o: lexer.cpp parser
 	g++ $(FLAGS) -c lexer.cpp 
 
 parser.o: parser
 	g++ -c parser.cpp
-
-virtual_machine.o: virtual_machine.cpp
-	g++ $(FLAGS) -c virtual_machine.cpp
 
 parser:
 	lemon parser.y -s

@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "ast.h"
+#include "lexer.h"
 #include "parser.h"
 #include "virtual_machine.h"
 
@@ -12,22 +13,46 @@ void Parse(void *parser, int token, const char *tokenInfo, Node **ast);
 void ParseFree(void *parser, void(*freeProc)(void *));
 
 int main() {
+    Lexer lexer("1 + 2");
+
+    lexer.lex();
+    assert(lexer.current_token.type == T_INTEGER);
+    assert(lexer.current_token.value == "1");
+    assert(lexer.current_token.line == 1);
+
+    lexer.lex();
+    assert(lexer.current_token.type == T_ADD);
+    assert(lexer.current_token.value == "+");
+    assert(lexer.current_token.line == 1);
+
+    lexer.lex();
+    assert(lexer.current_token.type == T_INTEGER);
+    assert(lexer.current_token.value == "2");
+    assert(lexer.current_token.line == 1);
+
+    lexer.lex();
+    assert(lexer.current_token.type == T_EOF);
+    assert(lexer.current_token.value == "");
+    assert(lexer.current_token.line == 1);
+
+    //////////////////////////////////////////
+
     VirtualMachine vm;
 
     void *parser = ParseAlloc(malloc);
     Node *AST = nullptr;
 
-    Parse(parser, PRINT, "print", &AST);
-    Parse(parser, INTEGER, "15", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_PRINT, "print", &AST);
+    Parse(parser, T_INTEGER, "15", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
     vm.execute(AST);
 
     //////////////////////////////////////////
 
-    Parse(parser, INTEGER, "15", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_INTEGER, "15", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
     assert(AST->value == "15");
@@ -38,12 +63,12 @@ int main() {
 
     //////////////////////////////////////////
 
-    Parse(parser, INTEGER, "15", &AST);
-    Parse(parser, ADD, "+", &AST);
-    Parse(parser, INTEGER, "20", &AST);
-    Parse(parser, MULT, "*", &AST);
-    Parse(parser, INTEGER, "5", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_INTEGER, "15", &AST);
+    Parse(parser, T_ADD, "+", &AST);
+    Parse(parser, T_INTEGER, "20", &AST);
+    Parse(parser, T_MULT, "*", &AST);
+    Parse(parser, T_INTEGER, "5", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
     assert(AST->value == "+");
@@ -60,14 +85,14 @@ int main() {
 
     //////////////////////////////////////////
 
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, ASSIGN, "=", &AST);
-    Parse(parser, INTEGER, "15", &AST);
-    Parse(parser, ADD, "+", &AST);
-    Parse(parser, INTEGER, "20", &AST);
-    Parse(parser, MULT, "*", &AST);
-    Parse(parser, INTEGER, "5", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_ASSIGN, "=", &AST);
+    Parse(parser, T_INTEGER, "15", &AST);
+    Parse(parser, T_ADD, "+", &AST);
+    Parse(parser, T_INTEGER, "20", &AST);
+    Parse(parser, T_MULT, "*", &AST);
+    Parse(parser, T_INTEGER, "5", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
     assert(AST->value == "=");
@@ -82,22 +107,22 @@ int main() {
 
     //////////////////////////////////////////
 
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, ASSIGN, "=", &AST);
-    Parse(parser, INTEGER, "15", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_ASSIGN, "=", &AST);
+    Parse(parser, T_INTEGER, "15", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
 
-    Parse(parser, IDENTIFIER, "b", &AST);
-    Parse(parser, ASSIGN, "=", &AST);
-    Parse(parser, INTEGER, "30", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "b", &AST);
+    Parse(parser, T_ASSIGN, "=", &AST);
+    Parse(parser, T_INTEGER, "30", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     
-    Parse(parser, IDENTIFIER, "c", &AST);
-    Parse(parser, ASSIGN, "=", &AST);
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, MULT, "*", &AST);
-    Parse(parser, IDENTIFIER, "b", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "c", &AST);
+    Parse(parser, T_ASSIGN, "=", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_MULT, "*", &AST);
+    Parse(parser, T_IDENTIFIER, "b", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
     assert(AST->value == "__compound");
@@ -118,57 +143,57 @@ int main() {
 
     //////////////////////////////////////////
 
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, ASSIGN, "=", &AST);
-    Parse(parser, INTEGER, "15", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_ASSIGN, "=", &AST);
+    Parse(parser, T_INTEGER, "15", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
 
-    Parse(parser, IDENTIFIER, "b", &AST);
-    Parse(parser, ASSIGN, "=", &AST);
-    Parse(parser, INTEGER, "30", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "b", &AST);
+    Parse(parser, T_ASSIGN, "=", &AST);
+    Parse(parser, T_INTEGER, "30", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     
-    Parse(parser, IDENTIFIER, "c", &AST);
-    Parse(parser, ASSIGN, "=", &AST);
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, MULT, "*", &AST);
-    Parse(parser, IDENTIFIER, "b", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "c", &AST);
+    Parse(parser, T_ASSIGN, "=", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_MULT, "*", &AST);
+    Parse(parser, T_IDENTIFIER, "b", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
 
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, MULT, "*", &AST);
-    Parse(parser, IDENTIFIER, "b", &AST);
-    Parse(parser, SUB, "-", &AST);
-    Parse(parser, IDENTIFIER, "c", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_MULT, "*", &AST);
+    Parse(parser, T_IDENTIFIER, "b", &AST);
+    Parse(parser, T_SUB, "-", &AST);
+    Parse(parser, T_IDENTIFIER, "c", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
     vm.execute(AST);
 
     //////////////////////////////////////////
 
-    Parse(parser, FUNCTION, "function", &AST);
-    Parse(parser, IDENTIFIER, "double", &AST);
-    Parse(parser, LPAREN, "(", &AST);
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, COMMA, ",", &AST);
-    Parse(parser, IDENTIFIER, "b", &AST);
-    Parse(parser, RPAREN, ")", &AST);
-    Parse(parser, LBRACE, "{", &AST);
-    Parse(parser, RETURN, "return", &AST);
-    Parse(parser, IDENTIFIER, "a", &AST);
-    Parse(parser, MULT, "*", &AST);
-    Parse(parser, INTEGER, "2", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
-    Parse(parser, RBRACE, "}", &AST);
+    Parse(parser, T_FUNCTION, "function", &AST);
+    Parse(parser, T_IDENTIFIER, "double", &AST);
+    Parse(parser, T_LPAREN, "(", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_COMMA, ",", &AST);
+    Parse(parser, T_IDENTIFIER, "b", &AST);
+    Parse(parser, T_RPAREN, ")", &AST);
+    Parse(parser, T_LBRACE, "{", &AST);
+    Parse(parser, T_RETURN, "return", &AST);
+    Parse(parser, T_IDENTIFIER, "a", &AST);
+    Parse(parser, T_MULT, "*", &AST);
+    Parse(parser, T_INTEGER, "2", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
+    Parse(parser, T_RBRACE, "}", &AST);
 
-    Parse(parser, IDENTIFIER, "double", &AST);
-    Parse(parser, LPAREN, "(", &AST);
-    Parse(parser, INTEGER, "7", &AST);
-    Parse(parser, COMMA, ",", &AST);
-    Parse(parser, INTEGER, "0", &AST);
-    Parse(parser, RPAREN, ")", &AST);
-    Parse(parser, SEMICOLON, ";", &AST);
+    Parse(parser, T_IDENTIFIER, "double", &AST);
+    Parse(parser, T_LPAREN, "(", &AST);
+    Parse(parser, T_INTEGER, "7", &AST);
+    Parse(parser, T_COMMA, ",", &AST);
+    Parse(parser, T_INTEGER, "0", &AST);
+    Parse(parser, T_RPAREN, ")", &AST);
+    Parse(parser, T_SEMICOLON, ";", &AST);
     Parse(parser, 0, 0, &AST);
 
     assert(AST);
