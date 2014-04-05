@@ -284,6 +284,10 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 std::cerr << "Identifier cannot be null." << std::endl;
                 exit(1);
             }
+            else if ((node->value->get_type() & StringTypeValue) == 0) {
+                std::cerr << "Identifier must be a string." << std::endl;
+                exit(1);
+            }
 
             std::string identifier = node->value->to_string();
 

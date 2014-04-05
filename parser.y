@@ -141,7 +141,7 @@ literal(A) ::= STRING(B). {
 	A = new Node(Node::String, new Value(B));
 }
 literal(A) ::= identifier(B). {
-	A = new Node(Node::Identifier, new Value(B));
+	A = B;
 }
 
 identifier(A) ::= IDENTIFIER(B). {
