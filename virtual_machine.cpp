@@ -116,6 +116,46 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
+        case Node::Equals: {
+            if (node->left == nullptr or node->right == nullptr) {
+                std::cerr << "Must have two values to do a comparison." << std::endl;
+                exit(1);
+            }
+
+            Value *left = evaluate(node->left, symbols);
+            Value *right = evaluate(node->right, symbols);
+            bool result = false;
+
+            switch (left->get_type()) {
+                case BooleanTypeValue:
+                    result = left->to_bool() == right->to_bool();
+                    break;
+                case IntegerTypeValue:
+                    result = left->to_integer() == right->to_integer();
+                    break;
+                case DoubleTypeValue:
+                    result = left->to_double() == right->to_double();
+                    break;
+                case StringTypeValue:
+                    result = left->to_string() == right->to_string();
+                    break;
+
+                case UnknownTypeValue:
+                case NullTypeValue:
+                    result = left->get_type() == right->get_type();
+                    break;
+
+                default:
+                case ArrayTypeValue:
+                    std::cerr << "Attempting to compare uncomparable types." << std::endl;
+                    exit(1);
+                    break;
+            }
+
+            return new Value(result);
+            break;
+        }
+
         case Node::Call: {
             if (node->left == nullptr) {
                 std::cerr << "Function cannot have an empty identifier." << std::endl;

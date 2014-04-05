@@ -163,6 +163,8 @@ void Lexer::lex_string() {
 
 bool Lexer::lex_special() {
     static const LexerSpecial operators[] = {
+        {"==", T_EQUALS},
+
         {"+", T_ADD},
         {"-", T_SUB},
         {"*", T_MULT},

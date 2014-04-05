@@ -1,15 +1,16 @@
-print "Test";
-
-if (true) {
-	print "Hello world!";
-}
-else {
-	print "Error!";
+function double(a) {
+	return (a * 2);
 }
 
-if (false) {
-	print "Error!";
+function test() {
+	return 1 == "1";
+}
+
+print test();
+
+if (test()) {
+	print "Works!";
 }
 else {
-	print "Howdy";
+	print "Does not work!";
 }
