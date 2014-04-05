@@ -23,6 +23,7 @@
 %right EQUALS.
 %left ADD SUB.
 %left MULT DIV MOD.
+%left LPAREN RPAREN.
 
 program ::= statements(A). {*AST = A;}
 
@@ -65,6 +66,9 @@ return(A) ::= RETURN expression(B). {
 	A = new Node(Node::Return, B);	
 } 
 
+expression(A) ::= LPAREN expression(B) RPAREN. {
+	A = B;
+}
 expression(A) ::= expression(B) ADD expression(C). {
 	A = new Node(Node::Add, B, C);
 }
