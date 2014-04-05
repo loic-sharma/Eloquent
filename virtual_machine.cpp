@@ -91,6 +91,26 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
+        case Node::Conditional: {
+            if (node->left == nullptr) {
+                std::cerr << "Conditional cannot have empty condition." << std::endl;
+                exit(1);
+            }
+
+            if (node->right == nullptr) {
+                return nullptr;
+            }
+
+            Value *left = evaluate(node->left, symbols);
+
+            if (left->to_bool()) {
+                evaluate(node->right, symbols);
+            }
+
+            return nullptr;
+            break;
+        }
+
         case Node::Call: {
             if (node->left == nullptr) {
                 std::cerr << "Function cannot have an empty identifier." << std::endl;

@@ -1,4 +1,13 @@
-a = true;
+print "Test";
 
-print a;
-print false;
+if (true) {
+	print "Hello world!";
+}
+
+if (false) {
+	print "ERROR!";
+}
+
+if (true) {
+	print "Okay, I think we get the idea.";
+}
