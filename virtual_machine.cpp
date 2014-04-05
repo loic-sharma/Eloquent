@@ -189,6 +189,12 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 exit(1);
             }
 
+            if ((left->get_type() & (IntegerTypeValue | DoubleTypeValue)) == 0) {
+                std::cout << "Type: " << left->get_type() << std::endl;
+                std::cerr << "Cannot perform arithmetic on value '" << left->to_string() << "'." << std::endl;
+                exit(1);         
+            }
+
             Value *right = evaluate(node->right, symbols);
 
             if (right == nullptr) {
@@ -196,8 +202,81 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 exit(1);
             }
             
-            return nullptr;
+            if ((right->get_type() & (IntegerTypeValue | DoubleTypeValue)) == 0) {
+                std::cerr << "Cannot perform arithmetic on value '" << left->to_string() << "'." << std::endl;
+                exit(1);         
+            }
 
+            // If one of these values is a double we will need to return a double.
+            if (left->get_type() & DoubleTypeValue or right->get_type() & DoubleTypeValue) {
+                double lval = left->to_double();
+                double rval = right->to_double();
+                double result;
+
+                switch (node->type) {
+                    case Node::Add:
+                        result = lval + rval;
+                        break;
+
+                    case Node::Sub:
+                        result = lval - rval;
+                        break;
+
+                    case Node::Mult:
+                        result = lval * rval;
+                        break;
+
+                    case Node::Div:
+                        result = lval / rval;
+                        break;
+
+                    case Node::Mod:
+                        std::cerr << "Cannot calculate mod of double." << std::endl;
+                        exit(1);
+                        break;
+
+                    default:
+                        std::cerr << "Invalid type: " << node->type << std::endl;
+                        exit(1);
+                        break;
+                }
+            }
+            else {
+                long lval = left->to_integer();
+                long rval = right->to_integer();
+                long result;
+
+                switch (node->type) {
+                    case Node::Add:
+                        result = lval + rval;
+                        break;
+
+                    case Node::Sub:
+                        result = lval - rval;
+                        break;
+
+                    case Node::Mult:
+                        result = lval * rval;
+                        break;
+
+                    case Node::Div:
+                        result = lval / rval;
+                        break;
+
+                    case Node::Mod:
+                        result = lval % rval;
+                        break;
+
+                    default:
+                        std::cerr << "Invalid type: " << node->type << std::endl;
+                        exit(1);
+                        break;
+                }
+
+                return new Value(result);
+            }
+
+            return nullptr;
             /*
             switch (node->type) {
                 case Node::Add:

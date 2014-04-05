@@ -12,14 +12,14 @@
 #include <string>
 #include <vector>
 
-typedef enum _Type {
-    BooleanTypeValue,
-    IntegerTypeValue,
-    DoubleTypeValue,
-    StringTypeValue,
-    ArrayTypeValue,
-    UnknownTypeValue,
-    NullTypeValue,
+typedef enum {
+    BooleanTypeValue = (1 << 0),
+    IntegerTypeValue = (1 << 1),
+    DoubleTypeValue  = (1 << 2),
+    StringTypeValue  = (1 << 3),
+    ArrayTypeValue   = (1 << 4),
+    UnknownTypeValue = (1 << 5),
+    NullTypeValue    = (1 << 6),
 } Type;
 
 class Value {

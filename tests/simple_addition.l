@@ -1,1 +1,6 @@
-print 1;
+function test() {
+	return "Hello world";
+}
+
+print "Hello world";
+print test();
