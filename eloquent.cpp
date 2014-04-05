@@ -39,13 +39,19 @@ int main() {
     void *parser = ParseAlloc(malloc);
     Node *AST = nullptr;
 
+    bool empty = true;
+    
     do {
         lexer.lex();
-
+        
         if (lexer.token.type == T_EOF) {
-            Parse(parser, 0, 0, &AST);
+            if (empty == false) {
+                Parse(parser, 0, 0, &AST);
+            }
         }
         else {
+            empty = false;
+            
             char *value = new char[lexer.token.value.length() + 1];
             std::strcpy(value, lexer.token.value.c_str());
 
