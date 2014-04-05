@@ -277,34 +277,6 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             }
 
             return nullptr;
-            /*
-            switch (node->type) {
-                case Node::Add:
-                    return new int(left + right);
-                    break;
-
-                case Node::Sub:
-                    return new int(left - right);
-                    break;
-
-                case Node::Mult:
-                    return new int(left * right);
-                    break;
-
-                case Node::Div:
-                    return new int(left / right);
-                    break;
-
-                case Node::Mod:
-                    return new int(left % right);
-                    break;
-
-                default:
-                    std::cerr << "Invalid type: " << node->type << std::endl;
-                    exit(1);
-                    break;
-            }
-            */
         }
 
         case Node::Identifier: {
@@ -319,7 +291,7 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 return (*symbols)[identifier];
             }
             else {
-                std::cerr << "Variable '" << node->value << "' does not exist." << std::endl;
+                std::cerr << "Variable '" << identifier << "' does not exist." << std::endl;
                 exit(1);               
             }
 
