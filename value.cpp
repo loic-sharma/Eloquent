@@ -90,8 +90,7 @@ long Value::to_integer() const {
             break;
             
         case StringTypeValue:
-            assert(false);
-            return 0;
+            return atol(string.c_str());
             break;
             
         case ArrayTypeValue:
