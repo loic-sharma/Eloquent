@@ -1,5 +1,9 @@
-function two() {
-	return 2;
+function double(a) {
+	return 2 * a;
 }
 
-print two();
+function four() {
+	return double(double(1));
+}
+
+print four();

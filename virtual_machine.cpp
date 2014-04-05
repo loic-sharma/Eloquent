@@ -88,6 +88,11 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
         }
 
         case Node::Call: {
+            if (node->left == nullptr) {
+                std::cerr << "Function cannot have an empty identifier." << std::endl;
+                exit(1);
+            }
+
             auto it = functions.find(node->left->value);
 
             if (it == functions.end()) {
@@ -113,9 +118,21 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                         if (current->left) nodes.push(current->left);
                     }
                     else {
+                        if (it->second.parameters.size() <= parameter_count) {
+                            std::cerr << "Too many parameters." << std::endl;
+                            exit(1);
+                        }
+
                         std::string name(it->second.parameters[parameter_count++]);
 
-                        (*parameters)[name] = atoi(current->value);
+                        int *expression = evaluate(current, symbols);
+
+                        if (expression == nullptr) {
+                            std::cerr << "Parameter cannot be null." << std::endl;
+                            exit(1);
+                        }
+
+                        (*parameters)[name] = *expression;
 
                         nodes.pop();
                     }
@@ -152,6 +169,8 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 std::cerr << "Missing left or right child for assignment." << std::endl;
                 exit(1);
             }
+
+            break;
         }
 
         case Node::Add:
