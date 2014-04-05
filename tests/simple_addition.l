@@ -3,11 +3,13 @@ print "Test";
 if (true) {
 	print "Hello world!";
 }
-
-if (false) {
-	print "ERROR!";
+else {
+	print "Error!";
 }
 
-if (true) {
-	print "Okay, I think we get the idea.";
+if (false) {
+	print "Error!";
+}
+else {
+	print "Howdy";
 }

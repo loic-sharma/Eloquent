@@ -92,18 +92,23 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
         }
 
         case Node::Conditional: {
-            if (node->left == nullptr) {
-                std::cerr << "Conditional cannot have empty condition." << std::endl;
+            if (node->left == nullptr or node->left->type != Node::Branch) {
+                std::cerr << "Conditional must have a branch." << std::endl;
                 exit(1);
             }
 
-            if (node->right == nullptr) {
-                return nullptr;
+            if (node->left->left == nullptr) {
+                std::cerr << "Conditional must have a condition." << std::endl;
+                exit(1);
             }
 
-            Value *left = evaluate(node->left, symbols);
 
-            if (left->to_bool()) {
+            Value *condition = evaluate(node->left->left, symbols);
+
+            if (condition->to_bool()) {
+                evaluate(node->left->right, symbols);
+            }
+            else {
                 evaluate(node->right, symbols);
             }
 

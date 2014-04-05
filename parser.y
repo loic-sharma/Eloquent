@@ -47,7 +47,18 @@ assignment(A) ::= identifier(B) ASSIGN expression(C) SEMICOLON. {
 }
 
 conditional(A) ::= IF expression(B) block(C). {
-	A = new Node(Node::Conditional, B, C);
+	Node *branch = new Node(Node::Branch, B, C);
+
+	A = new Node(Node::Conditional, branch, nullptr);
+}
+conditional(A) ::= IF expression(B) block(C) else(d). {
+	Node *branch = new Node(Node::Branch, B, C);
+
+	A = new Node(Node::Conditional, branch, d);
+}
+
+else(A) ::= ELSE block(B). {
+	A = B;
 }
 
 block(A) ::= LBRACE statements(B) RBRACE. {

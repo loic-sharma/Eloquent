@@ -14,7 +14,7 @@ public:
 		Identifier,
 
 		Compound, Prototype, Conditional,
-		Call, Separator,
+		Branch, Call, Separator,
 	};
 
 	Node(const Type t, Node *l = nullptr, Node *r = nullptr) : type(t), value(nullptr), left(l), right(r) {};
