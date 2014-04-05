@@ -24,12 +24,9 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
     switch (node->type) {
         case Node::Compound: {
-            Value *left_ptr = evaluate(node->left, symbols);
-            Value *right_ptr = evaluate(node->right, symbols);
-
-            delete left_ptr;
-
-            return right_ptr;
+            evaluate(node->left, symbols);
+            
+            return evaluate(node->right, symbols);
             break;
         }
 
@@ -43,7 +40,6 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
             std::cout << expression->to_string() << std::endl;
 
-            delete expression;
             return nullptr;
             break;
         }
@@ -216,9 +212,17 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
-        case Node::Return:
-            return evaluate(node->left, symbols);
+        case Node::Return: {
+            Value *result = evaluate(node->left, symbols);
+
+            if (result == nullptr) {
+                std::cerr << "Must return a value." << std::endl;
+                exit(1);
+            }
+
+            return result;
             break;
+        }
 
         case Node::Assign: {
             if (node->left and node->right) {
