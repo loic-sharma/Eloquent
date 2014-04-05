@@ -1,6 +1,8 @@
 #ifndef __Eloquent_ast__
 #define __Eloquent_ast__
 
+#include "value.h"
+
 class Node {
 public:
 	enum Type {
