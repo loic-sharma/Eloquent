@@ -178,7 +178,9 @@ bool Lexer::lex_special() {
         {"if", T_IF},
         {"print", T_PRINT},
         {"function", T_FUNCTION},
-        {"return", T_RETURN},/*
+        {"return", T_RETURN},
+        {"true", T_TRUE},
+        {"false", T_FALSE},/*
         {"elseif", T_ELSEIF},
         {"else", T_ELSE},
         {"and", T_AND},

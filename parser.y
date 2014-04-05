@@ -140,8 +140,18 @@ literal(A) ::= DOUBLE(B). {
 literal(A) ::= STRING(B). {
 	A = new Node(Node::String, new Value(B));
 }
+literal(A) ::= boolean(B). {
+	A = B;
+}
 literal(A) ::= identifier(B). {
 	A = B;
+}
+
+boolean(A) ::= TRUE. {
+	A = new Node(Node::Boolean, new Value(true));
+}
+boolean(A) ::= FALSE. {
+	A = new Node(Node::Boolean, new Value(false));
 }
 
 identifier(A) ::= IDENTIFIER(B). {

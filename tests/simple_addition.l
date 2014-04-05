@@ -1,3 +1,4 @@
-a = "test";
+a = true;
 
 print a;
+print false;

@@ -305,6 +305,7 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
         case Node::Integer:
         case Node::Double:
         case Node::String:
+        case Node::Boolean:
             return node->value;
             break;
 

@@ -10,7 +10,8 @@ public:
 		Add, Sub, Mult,
 		Div, Mod, Function,
 		If, Print, Integer,
-		Double, String, Identifier,
+		Double, String, Boolean,
+		Identifier,
 
 		Compound, Prototype, Conditional,
 		Call, Separator,
