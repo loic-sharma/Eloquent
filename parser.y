@@ -4,6 +4,7 @@
 	#include <cassert>
 	#include <stdlib.h>
 	#include "ast.h"
+	#include "value.h"
 }
 
 %syntax_error
@@ -127,18 +128,22 @@ call_parameter_list(A) ::= expression(B). {
 }
 
 literal(A) ::= INTEGER(B). {
-	A = new Node(B);
+	int value = atoi(B);
+
+	A = new Node(Node::Integer, new Value(value));
 }
 literal(A) ::= DOUBLE(B). {
-	A = new Node(B);
+	double value = atof(B);
+
+	A = new Node(Node::Double, new Value(value));
 }
 literal(A) ::= STRING(B). {
-	A = new Node(B);
+	A = new Node(Node::String, new Value(B));
 }
 literal(A) ::= identifier(B). {
-	A = B;
+	A = new Node(Node::Identifier, new Value(B));
 }
 
 identifier(A) ::= IDENTIFIER(B). {
-	A = new Node(B);
+	A = new Node(Node::Identifier, new Value(B));
 }

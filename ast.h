@@ -1,7 +1,7 @@
 #ifndef __Eloquent_ast__
 #define __Eloquent_ast__
 
-#include "value.h"
+class Value;
 
 class Node {
 public:
@@ -17,10 +17,10 @@ public:
 	};
 
 	Node(const Type t, Node *l = nullptr, Node *r = nullptr) : type(t), value(nullptr), left(l), right(r) {};
-	Node(const char *v, Node *l = nullptr, Node *r = nullptr) : type(Identifier), value(v), left(l), right(r) {};
+	Node(const Type t, Value *v, Node *l = nullptr, Node *r = nullptr) : type(t), value(v), left(l), right(r) {};
 
 	Type type;
-	const char *value;
+	Value *value;
 
 	Node *left;
 	Node *right;

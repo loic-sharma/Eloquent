@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stack>
 
+#include "value.h"
+
 void VirtualMachine::execute(Node *AST) {
 	Symbols *symbols = new Symbols;
 
@@ -12,7 +14,7 @@ void VirtualMachine::execute(Node *AST) {
 	delete symbols;
 }
 
-int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
+Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 	if (node == nullptr) return nullptr;
 
     if (symbols == nullptr) {
@@ -22,8 +24,8 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
     switch (node->type) {
         case Node::Compound: {
-            int *left_ptr = evaluate(node->left, symbols);
-            int *right_ptr = evaluate(node->right, symbols);
+            Value *left_ptr = evaluate(node->left, symbols);
+            Value *right_ptr = evaluate(node->right, symbols);
 
             delete left_ptr;
 
@@ -32,14 +34,16 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
         }
 
         case Node::Print: {
-            int *expression = evaluate(node->left, symbols);
+            Value *expression = evaluate(node->left, symbols);
 
             if (expression == nullptr) {
                 std::cerr << "Nothing to print." << std::endl;
                 exit(1);
             }
 
-            std::cout << *expression << std::endl;
+            std::cout << expression->to_string() << std::endl;
+
+            delete expression;
             return nullptr;
             break;
         }
@@ -67,14 +71,14 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                             if (current->left) nodes.push(current->left);
                         }
                         else {
-                            parameters.push_back(current->value);
+                            parameters.push_back(current->value->to_string());
 
                             nodes.pop();
                         }
                     }
                 }
 
-                std::string function_name(node->left->left->value);
+                std::string function_name = node->left->left->value->to_string();
 
                 functions[function_name] = {
                     function_name,
@@ -93,10 +97,10 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 exit(1);
             }
 
-            auto it = functions.find(node->left->value);
+            auto it = functions.find(node->left->value->to_string());
 
             if (it == functions.end()) {
-                std::cerr << "Invalid function '" << node->left->value << "'" << std::endl;
+                std::cerr << "Invalid function '" << node->left->value->to_string() << "'" << std::endl;
                 exit(1);
             }
 
@@ -125,21 +129,21 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
                         std::string name(it->second.parameters[parameter_count++]);
 
-                        int *expression = evaluate(current, symbols);
+                        Value *value = evaluate(current, symbols);
 
-                        if (expression == nullptr) {
+                        if (value == nullptr) {
                             std::cerr << "Parameter cannot be null." << std::endl;
                             exit(1);
                         }
 
-                        (*parameters)[name] = *expression;
+                        (*parameters)[name] = value;
 
                         nodes.pop();
                     }
                 }
             }
 
-            int *result = evaluate(it->second.content, parameters);
+            Value *result = evaluate(it->second.content, parameters);
 
             delete parameters;
 
@@ -153,10 +157,10 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
         case Node::Assign: {
             if (node->left and node->right) {
-                int *value = evaluate(node->right, symbols);
+                Value *value = evaluate(node->right, symbols);
 
                 if (value) {
-                    (*symbols)[node->left->value] = *value;
+                    (*symbols)[node->left->value->to_string()] = value;
                 }
                 else {
                     std::cerr << "Value is a null pointer." << std::endl;
@@ -178,25 +182,23 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
         case Node::Mult:
         case Node::Div:
         case Node::Mod: {
-            int *left_ptr = evaluate(node->left, symbols);
+            Value *left = evaluate(node->left, symbols);
 
-            if (left_ptr == nullptr) {
+            if (left == nullptr) {
                 std::cerr << "Left side cannot be null." << std::endl;
                 exit(1);
             }
 
-            int *right_ptr = evaluate(node->right, symbols);
+            Value *right = evaluate(node->right, symbols);
 
-            if (right_ptr == nullptr) {
+            if (right == nullptr) {
                 std::cerr << "Left side cannot be null." << std::endl;
                 exit(1);
             }
             
-            int left = *left_ptr, right = *right_ptr;
+            return nullptr;
 
-            delete left_ptr;
-            delete right_ptr;
-
+            /*
             switch (node->type) {
                 case Node::Add:
                     return new int(left + right);
@@ -223,26 +225,32 @@ int *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                     exit(1);
                     break;
             }
+            */
         }
 
-        case Node::Identifier:
+        case Node::Identifier: {
             if (node->value == nullptr) {
                 std::cerr << "Identifier cannot be null." << std::endl;
                 exit(1);
             }
 
-            if (node->value and (*node->value >= '0' and *node->value <= '9')) {
-                return new int(atoi(node->value));
+            std::string identifier = node->value->to_string();
+
+            if (symbols->find(identifier) != symbols->end()) {
+                return (*symbols)[identifier];
             }
             else {
-                if (symbols->find(node->value) != symbols->end()) {
-                    return new int((*symbols)[node->value]);
-                }
-                else {
-                    std::cerr << "Variable '" << node->value << "' does not exist." << std::endl;
-                    exit(1);
-                }
+                std::cerr << "Variable '" << node->value << "' does not exist." << std::endl;
+                exit(1);               
             }
+
+            break;
+        }
+
+        case Node::Integer:
+        case Node::Double:
+        case Node::String:
+            return node->value;
             break;
 
         default:

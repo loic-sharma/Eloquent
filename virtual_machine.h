@@ -6,6 +6,7 @@
 #include <string>
 
 class Node;
+class Value;
 
 struct Function {
     std::string name;
@@ -13,7 +14,7 @@ struct Function {
     Node *content;
 };
 
-typedef std::unordered_map<std::string, int> Symbols;
+typedef std::unordered_map<std::string, Value *> Symbols;
 
 class VirtualMachine {
 
@@ -21,7 +22,7 @@ public:
     void execute(Node *AST);
 
 private:
-    int *evaluate(Node *node, Symbols *symbols = nullptr);
+    Value *evaluate(Node *node, Symbols *symbols = nullptr);
 
     std::unordered_map<std::string, Function> functions;
 };
