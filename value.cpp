@@ -31,17 +31,17 @@ Value::Value(double v) {
 
 Value::Value(char v) {
     type = StringTypeValue;
-    string_value = v;
+    string = v;
 }
 
 Value::Value(const char *v) {
     type = StringTypeValue;
-    string_value = v;
+    string = v;
 }
 
 Value::Value(std::string v) {
     type = StringTypeValue;
-    string_value = v;
+    string = v;
 }
 
 Type Value::get_type() const {
@@ -63,7 +63,7 @@ bool Value::to_bool() const {
             break;
             
         case StringTypeValue:
-            return (string_value.empty() == false);
+            return (string.empty() == false);
             break;
             
         case ArrayTypeValue:            
@@ -122,7 +122,7 @@ std::string Value::to_string() const {
             break;
 
         case StringTypeValue:
-            return string_value;
+            return string;
             break;
 
         case ArrayTypeValue:

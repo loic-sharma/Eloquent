@@ -65,7 +65,7 @@ private:
 		double doublez;
 	} value;
     
-    std::string string_value;
+    std::string string;
 };
 
 #endif
