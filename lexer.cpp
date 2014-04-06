@@ -157,7 +157,7 @@ void Lexer::lex_string() {
     character = string_end + 1;
     
     token.type = T_STRING;
-    token.value = input.substr(string_start - start, string_end - string_start);
+    token.value = std::string(string_start, string_end);
     token.line = line;
 }
 
@@ -236,6 +236,6 @@ void Lexer::lex_identifier() {
     character = ident_end;
     
     token.type = T_IDENTIFIER;
-    token.value = input.substr(ident_start - start, ident_end - ident_start);
+    token.value = std::string(ident_start, ident_end);
     token.line = line;
 }

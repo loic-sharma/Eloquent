@@ -1,12 +1,3 @@
-function test() {
-	if (true) {
-		return "Hello";
-	}
-	else {
-		return "Hmm";
-	}
-}
+a = "test\nhmm";
 
-print "====";
-print test();
-print test();
+print a;
