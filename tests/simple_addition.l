@@ -1,14 +1,15 @@
+// Test
 function iterate() {
 	for i = 10; i != 0; i-- {
 		print i;
 	}
-
+	/*
 	if (i == 0) {
 		return 1;
-	}
-	else {
+	}*/
+	// else {
 		return 0;
-	}
+	// }
 
 	return "test";
 }

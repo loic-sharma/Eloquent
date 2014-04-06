@@ -39,8 +39,12 @@ private:
     // The current position's line number of the input.
     unsigned int line;
     
+    void skip_skippable();
     void skip_whitespace();
+    void skip_comments();
 
+    bool is_comment() const;
+    bool is_whitespace() const;
     bool is_number_start() const;
     bool is_string_start() const;
     bool is_string_end(char current, char previous, char opening) const;

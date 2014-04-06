@@ -22,7 +22,7 @@ Lexer::Lexer(std::string i)
 void Lexer::lex() {
     // We have not peeked at the next token so we will need to manually
     // lex it. Let's get to it!
-    skip_whitespace();
+    skip_skippable();
     
     // Are we at the last character?
     if (character == nullptr or *character == '\0') {
@@ -58,16 +58,75 @@ void Lexer::lex() {
     }
 }
 
+void Lexer::skip_skippable() {
+    while (is_comment() or is_whitespace()) {
+        skip_whitespace();
+        skip_comments();
+    }
+}
+
 void Lexer::skip_whitespace() {
     if (character == nullptr) return;
 
-    while (*character == ' ' or *character == '\n' or *character == '\t') {
+    while (is_whitespace()) {
         if (*character == '\n') {
             ++line;
         }
 
         ++character;
     }
+}
+
+void Lexer::skip_comments() {
+    if (character == nullptr) return;
+
+    if (*character == '/') {
+        if (*(character + 1) == '/') {
+            character += 2;
+
+            while (*character != '\n') {
+                if (*character == 0) {
+                    break;
+                }
+
+                ++character;
+            }
+
+            ++line;            
+        }
+        else if (*(character + 1) == '*') {
+            character += 2;
+
+            while (*character != '*' and *(character + 1) != '/') {
+                if (*character == 0) {
+                    std::cerr << "Unterminated comment" << std::endl;
+                    exit(1);
+                }
+
+                if (*character == '\n') {
+                    ++line;
+                }
+
+                ++character;
+            }
+
+            character += 2;
+        }
+    }
+}
+
+bool Lexer::is_comment() const {
+    if (*character == '/') {
+        const char *next = character + 1;
+        
+        return (*next and (*next == '/' or *next == '*'));     
+    }
+
+    return false;
+}
+
+bool Lexer::is_whitespace() const {
+    return (*character == ' ' or *character == '\n' or *character == '\t');
 }
 
 bool Lexer::is_number_start() const {
