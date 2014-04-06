@@ -31,12 +31,17 @@ program ::= statements(A). {*AST = A;}
 statements(A) ::= statements(B) statement(C).   {A = new Node(Node::Compound, B, C); }
 statements(A) ::= statement(B).                 {A = B;}
 
+statement(A) ::= while(B).                {A = B;}
 statement(A) ::= function(B).             {A = B;}
 statement(A) ::= assignment(B).           {A = B;}
 statement(A) ::= conditional(B).          {A = B;}
 statement(A) ::= print(B) SEMICOLON.      {A = B;}
 statement(A) ::= return(B) SEMICOLON.     {A = B;}
 statement(A) ::= expression(B) SEMICOLON. {A = B;}
+
+while(A) ::= WHILE expression(B) block(C). {
+	A = new Node(Node::While, B, C);
+}
 
 function(A) ::= FUNCTION identifier(B) declaration_parameters(C) block(D). {
 	A = new Node(Node::Function, new Node(Node::Prototype, B, C), D);

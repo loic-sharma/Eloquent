@@ -118,6 +118,33 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
+        case Node::While: {
+            bool done = false;
+
+            while (done == false) {
+                Value *condition = evaluate(node->left, symbols);
+
+                if (condition == nullptr) {
+                    std::cerr << "While condition cannot be null." << std::endl;
+                    exit(1);
+                }
+
+                if (condition->to_bool()) {
+                    Value *result = evaluate(node->right, symbols);
+
+                    if (state == ReturnState) {
+                        return result;
+                    }
+                }
+                else {
+                    done = true;
+                }
+            }
+
+            return nullptr;
+            break;
+        }
+
         case Node::Equals: {
             if (node->left == nullptr or node->right == nullptr) {
                 std::cerr << "Must have two values to do a comparison." << std::endl;

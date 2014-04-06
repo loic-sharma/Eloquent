@@ -1,3 +1,5 @@
-a = "test\nhmm";
+i = 0;
 
-print a;
+while (i == 0) {
+	print "test";
+}
