@@ -35,14 +35,14 @@ statements(A) ::= statement(B).                 {A = B;}
 statement(A) ::= for(B).                  {A = B;}
 statement(A) ::= while(B).                {A = B;}
 statement(A) ::= function(B).             {A = B;}
-statement(A) ::= assignment(B).           {A = B;}
 statement(A) ::= conditional(B).          {A = B;}
 statement(A) ::= print(B) SEMICOLON.      {A = B;}
 statement(A) ::= return(B) SEMICOLON.     {A = B;}
 statement(A) ::= expression(B) SEMICOLON. {A = B;}
+statement(A) ::= assignment(B) SEMICOLON. {A = B;}
 statement(A) ::= SEMICOLON.               {A = nullptr;}
 
-for(A) ::= FOR LPAREN statement(B) statement(C) statement(D) RPAREN block(E). {
+for(A) ::= FOR LPAREN for_statement(B) SEMICOLON for_statement(C) SEMICOLON for_statement(D) RPAREN block(E). {
 	Node *block = new Node(Node::Compound, E, D);
 	Node *loop = new Node(Node::Loop, C, block);
 
@@ -54,7 +54,7 @@ for(A) ::= FOR LPAREN statement(B) statement(C) statement(D) RPAREN block(E). {
 	}
 }
 
-for(A) ::= FOR statement(B) statement(C) statement(D) block(E). {
+for(A) ::= FOR for_statement(B) SEMICOLON for_statement(C) SEMICOLON for_statement(D) block(E). {
 	Node *block = new Node(Node::Compound, E, D);
 	Node *loop = new Node(Node::Loop, C, block);
 
@@ -65,6 +65,9 @@ for(A) ::= FOR statement(B) statement(C) statement(D) block(E). {
 		A = new Node(Node::Compound, B, loop);
 	}
 }
+
+for_statement(A) ::= assignment(B). {A = B;}
+for_statement(A) ::= expression(B). {A = B;}
 
 while(A) ::= WHILE expression(B) block(C). {
 	A = new Node(Node::Loop, B, C);
@@ -74,7 +77,7 @@ function(A) ::= FUNCTION identifier(B) declaration_parameters(C) block(D). {
 	A = new Node(Node::Function, new Node(Node::Prototype, B, C), D);
 }
 
-assignment(A) ::= identifier(B) ASSIGN expression(C) SEMICOLON. {
+assignment(A) ::= identifier(B) ASSIGN expression(C). {
 	A = new Node(Node::Assign, B, C);
 }
 
