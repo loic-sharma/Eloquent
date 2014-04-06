@@ -6,9 +6,10 @@ class Value;
 class Node {
 public:
 	enum Type {
-		Return, Assign, Equals,
+		Return, Assign,
 		Add, Sub, Mult,
-		Div, Mod, Function,
+		Div, Mod, Increment,
+		Function, Equals, NEquals,
 		If, Print, Integer,
 		Double, String, Boolean,
 		Identifier,

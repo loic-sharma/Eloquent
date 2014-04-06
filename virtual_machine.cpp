@@ -145,7 +145,8 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
-        case Node::Equals: {
+        case Node::Equals:
+        case Node::NEquals: {
             if (node->left == nullptr or node->right == nullptr) {
                 std::cerr << "Must have two values to do a comparison." << std::endl;
                 exit(1);
@@ -179,6 +180,10 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                     std::cerr << "Attempting to compare uncomparable types." << std::endl;
                     exit(1);
                     break;
+            }
+
+            if (node->type == Node::NEquals) {
+                result = !result;
             }
 
             return new Value(result);
@@ -280,6 +285,31 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 exit(1);
             }
 
+            break;
+        }
+
+        case Node::Increment: {
+            std::string identifier = node->left->value->to_string();
+
+            if (symbols->find(identifier) == symbols->end()) {
+                std::cerr << "Variable '" << identifier << "' does not exit." << std::endl;
+                exit(1);
+            }
+
+            Value *value = symbols->at(identifier);
+
+            if (value->get_type() == IntegerTypeValue) {
+                (*symbols)[identifier] = new Value(value->to_integer() + 1);
+            }
+            else if (value->get_type() == DoubleTypeValue) {
+                (*symbols)[identifier] = new Value(value->to_double() + 1);
+            }
+            else {
+                std::cerr << "Cannot perform arithmetic on value '" << identifier << "'." << std::endl;
+                exit(1);
+            }
+
+            return symbols->at(identifier);
             break;
         }
 

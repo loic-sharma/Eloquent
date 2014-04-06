@@ -21,9 +21,10 @@
 %left RETURN.
 %left COMMA.
 %right ASSIGN.
-%right EQUALS.
+%right NEQUALS EQUALS.
 %left ADD SUB.
 %left MULT DIV MOD.
+%right INCREMENT.
 %left LPAREN RPAREN.
 
 program ::= statements(A). {*AST = A;}
@@ -95,11 +96,9 @@ else(A) ::= ELSE block(B). {
 block(A) ::= LBRACE statements(B) RBRACE. {
 	A = B;
 }
-
 block(A) ::= LBRACE RBRACE. {
 	A = nullptr;
 }
-
 
 print(A) ::= PRINT expression(B). {
 	A = new Node(Node::Print, B);
@@ -130,6 +129,13 @@ expression(A) ::= expression(B) MOD expression(C). {
 expression(A) ::= expression(B) EQUALS expression(C). {
 	A = new Node(Node::Equals, B, C);
 }
+expression(A) ::= expression(B) NEQUALS expression(C). {
+	A = new Node(Node::NEquals, B, C);
+}
+expression(A) ::= identifier(B) INCREMENT. {
+	A = new Node(Node::Increment, B);
+}
+
 expression(A) ::= function_call(B). {
 	A = B;
 }

@@ -1,5 +1,3 @@
-i = 0;
-
-while (i == 0) {
-	print "Hi";
+for i = 0; i != 10; i++; {
+	print i;
 }
