@@ -1,6 +1,10 @@
 function test() {
-	return "hello";
-	return "hmm";
+	if (true) {
+		return "Hello";
+	}
+	else {
+		return "Hmm";
+	}
 }
 
 print "====";

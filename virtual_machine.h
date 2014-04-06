@@ -24,7 +24,13 @@ public:
 private:
     Value *evaluate(Node *node, Symbols *symbols = nullptr);
 
+	enum State {
+		NormalState,
+		ReturnState,
+	};
+
     std::unordered_map<std::string, Function> functions;
+    State state;
 };
 
 #endif

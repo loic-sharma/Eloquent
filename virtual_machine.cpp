@@ -8,6 +8,7 @@
 
 void VirtualMachine::execute(Node *AST) {
 	Symbols *symbols = new Symbols;
+    state = NormalState;
 
 	evaluate(AST, symbols);
 
@@ -24,9 +25,15 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
     switch (node->type) {
         case Node::Compound: {
-            evaluate(node->left, symbols);
+            Value *result = evaluate(node->left, symbols);
             
-            return evaluate(node->right, symbols);
+            if (state == ReturnState) {
+                return result;
+            }
+            else {
+                return evaluate(node->right, symbols);
+            }
+
             break;
         }
 
@@ -102,13 +109,12 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             Value *condition = evaluate(node->left->left, symbols);
 
             if (condition->to_bool()) {
-                evaluate(node->left->right, symbols);
+                return evaluate(node->left->right, symbols);
             }
             else {
-                evaluate(node->right, symbols);
+                return evaluate(node->right, symbols);
             }
 
-            return nullptr;
             break;
         }
 
@@ -206,6 +212,8 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 
             Value *result = evaluate(it->second.content, parameters);
 
+            state = NormalState;
+
             delete parameters;
 
             return result;
@@ -219,6 +227,8 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 std::cerr << "Must return a value." << std::endl;
                 exit(1);
             }
+
+            state = ReturnState;
 
             return result;
             break;
