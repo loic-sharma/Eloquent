@@ -167,6 +167,7 @@ bool Lexer::lex_special() {
         {"!=", T_NEQUALS},
 
         {"++", T_INCREMENT},
+        {"--", T_DECREMENT},
 
         {"+", T_ADD},
         {"-", T_SUB},

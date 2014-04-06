@@ -8,7 +8,8 @@ public:
 	enum Type {
 		Return, Assign,
 		Add, Sub, Mult,
-		Div, Mod, Increment,
+		Div, Mod,
+		Increment, Decrement,
 		Function, Equals, NEquals,
 		If, Print, Integer,
 		Double, String, Boolean,

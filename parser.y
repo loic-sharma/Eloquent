@@ -135,6 +135,9 @@ expression(A) ::= expression(B) NEQUALS expression(C). {
 expression(A) ::= identifier(B) INCREMENT. {
 	A = new Node(Node::Increment, B);
 }
+expression(A) ::= identifier(B) DECREMENT. {
+	A = new Node(Node::Decrement, B);
+}
 
 expression(A) ::= function_call(B). {
 	A = B;

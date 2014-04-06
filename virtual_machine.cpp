@@ -288,7 +288,8 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
-        case Node::Increment: {
+        case Node::Increment:
+        case Node::Decrement: {
             std::string identifier = node->left->value->to_string();
 
             if (symbols->find(identifier) == symbols->end()) {
@@ -297,12 +298,13 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             }
 
             Value *value = symbols->at(identifier);
+            int d = (node->type == Node::Increment) ? 1 : -1;
 
             if (value->get_type() == IntegerTypeValue) {
-                (*symbols)[identifier] = new Value(value->to_integer() + 1);
+                (*symbols)[identifier] = new Value(value->to_integer() + d);
             }
             else if (value->get_type() == DoubleTypeValue) {
-                (*symbols)[identifier] = new Value(value->to_double() + 1);
+                (*symbols)[identifier] = new Value(value->to_double() + d);
             }
             else {
                 std::cerr << "Cannot perform arithmetic on value '" << identifier << "'." << std::endl;
