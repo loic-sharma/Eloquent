@@ -118,14 +118,14 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
-        case Node::While: {
+        case Node::Loop: {
             bool done = false;
 
             while (done == false) {
                 Value *condition = evaluate(node->left, symbols);
 
                 if (condition == nullptr) {
-                    std::cerr << "While condition cannot be null." << std::endl;
+                    std::cerr << "Loop condition cannot be null." << std::endl;
                     exit(1);
                 }
 

@@ -16,7 +16,7 @@ public:
 		Compound, Prototype, Conditional,
 		Branch, Call, Separator,
 
-		While,
+		Loop,
 	};
 
 	Node(const Type t, Node *l = nullptr, Node *r = nullptr) : type(t), value(nullptr), left(l), right(r) {};

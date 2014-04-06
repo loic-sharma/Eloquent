@@ -184,7 +184,8 @@ bool Lexer::lex_special() {
         {"return", T_RETURN},
         {"true", T_TRUE},
         {"false", T_FALSE},
-        {"while", T_WHILE},/*
+        {"while", T_WHILE},
+        {"for", T_FOR},/*
         {"elseif", T_ELSEIF},
         {"else", T_ELSE},
         {"and", T_AND},
