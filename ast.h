@@ -10,10 +10,12 @@ public:
 		Add, Sub, Mult,
 		Div, Mod,
 		Increment, Decrement,
-		Function, Equals, NEquals,
-		If, Print, Integer,
-		Double, String, Boolean,
-		Identifier,
+		Function, Print,
+		Integer, Double, String,
+		Boolean, Identifier,
+
+		If, Equals, NEquals,
+		And, Or,
 
 		Compound, Prototype, Conditional,
 		Branch, Call, Separator,

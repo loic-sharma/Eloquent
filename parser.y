@@ -9,7 +9,7 @@
 
 %syntax_error
 {
-	std::cout << "ERROR!\n";
+	std::cout << "Unexpected '" << TOKEN << "'.\n";
 }
 
 %extra_argument {Node **AST}
@@ -20,6 +20,8 @@
 
 %left RETURN.
 %left COMMA.
+%left OR.
+%left AND.
 %right ASSIGN.
 %right NEQUALS EQUALS.
 %left ADD SUB.
@@ -134,6 +136,12 @@ expression(A) ::= expression(B) EQUALS expression(C). {
 }
 expression(A) ::= expression(B) NEQUALS expression(C). {
 	A = new Node(Node::NEquals, B, C);
+}
+expression(A) ::= expression(B) AND expression(C). {
+	A = new Node(Node::And, B, C);
+}
+expression(A) ::= expression(B) OR expression(C). {
+	A = new Node(Node::Or, B, C);
 }
 expression(A) ::= identifier(B) INCREMENT. {
 	A = new Node(Node::Increment, B);

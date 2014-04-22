@@ -118,6 +118,36 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             break;
         }
 
+        case Node::And: {
+            if (node->left == nullptr or node->right == nullptr) {
+                std::cout << "And statement requires two sub-expressions." << std::endl;
+                exit(1);
+            }
+
+            Value *left = evaluate(node->left, symbols);
+
+            if (left->to_bool()) {
+                return evaluate(node->right, symbols);
+            }
+
+            return left;
+        }
+
+        case Node::Or: {
+            if (node->left == nullptr or node->right == nullptr) {
+                std::cout << "Or statement requires two sub-expressions." << std::endl;
+                exit(1);
+            }
+
+            Value *left = evaluate(node->left, symbols);
+
+            if (left->to_bool() == false) {
+                return evaluate(node->right, symbols);
+            }
+
+            return left;
+        }
+
         case Node::Loop: {
             bool done = false;
 

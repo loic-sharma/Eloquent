@@ -1,20 +1,10 @@
-// Test
-function iterate() {
-	for i = 10; i != 0; i-- {
-		print i;
-	}
-	/*
-	if (i == 0) {
-		return 1;
-	}*/
-	// else {
-		return 0;
-	// }
+a = 2;
+b = 3;
+c = 4;
 
-	return "test";
+if (a == 1 or b == 2 or c == 4) {
+	print "Yes!";
 }
-
-print iterate();
-print "ok";
-
-print (1 + 2) * 3;
+else {
+	print "No!";
+}
