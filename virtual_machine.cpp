@@ -7,16 +7,16 @@
 #include "value.h"
 
 void VirtualMachine::execute(Node *AST) {
-	Symbols *symbols = new Symbols;
+    Symbols *symbols = new Symbols;
     state = NormalState;
 
-	evaluate(AST, symbols);
+    evaluate(AST, symbols);
 
-	delete symbols;
+    delete symbols;
 }
 
 Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
-	if (node == nullptr) return nullptr;
+    if (node == nullptr) return nullptr;
 
     if (symbols == nullptr) {
         std::cerr << "Symbols table cannot be null" << std::endl;
@@ -104,7 +104,6 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
                 std::cerr << "Conditional must have a condition." << std::endl;
                 exit(1);
             }
-
 
             Value *condition = evaluate(node->left->left, symbols);
 
@@ -372,7 +371,7 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             
             if ((right->get_type() & (IntegerTypeValue | DoubleTypeValue)) == 0) {
                 std::cerr << "Cannot perform arithmetic on value '" << left->to_string() << "'." << std::endl;
-                exit(1);         
+                exit(1);
             }
 
             // If one of these values is a double we will need to return a double.
