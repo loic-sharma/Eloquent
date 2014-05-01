@@ -8,7 +8,13 @@
 #include "ast.h"
 #include "lexer.h"
 #include "parser.h"
+#include "compiler.h"
 #include "virtual_machine.h"
+
+
+#include <iostream>
+#include "value.h"
+
 
 void *ParseAlloc(void *(*allocProc)(size_t));
 void Parse(void *parser, int token, const char *tokenInfo, Node **ast);
@@ -60,9 +66,46 @@ int main() {
     }
     while (lexer.token.type != T_EOF and lexer.token.type != T_UNKNOWN);
 
-    VirtualMachine vm;
+    Compiler compiler;
 
-    vm.execute(AST);
+    Program *program = compiler.compile(AST);
+
+    static std::string instructions[] = {
+        "Jump",
+        "Print",
+        "Call",
+        "Return",
+        "Assign",
+        "TrueJump",
+        "FalseJump",
+        "And",
+        "Or",
+        "Equals",
+        "NEquals",
+        "Increment",
+        "Decrement",
+        "Add",
+        "Sub",
+        "Mult",
+        "Div",
+        "Mod",
+        "Identifier",
+        "Value"
+    };
+
+    for (auto i = program->instructions->begin(); i != program->instructions->end(); ++i) {
+        std::cout << instructions[i->type];
+
+        if (i->type == Instruction::ValueType or i->type == Instruction::IdentifierType) {
+            std::cout << " (" << i->value->to_string() << ')';
+        }
+
+        std::cout << std::endl;
+    }
+
+    // VirtualMachine vm;
+
+    // vm.execute(AST);
 
     return 0;
 }
