@@ -80,6 +80,7 @@ void execute(const char *file) {
 
 int main() {
     execute("tests/hello_world.l");
+    execute("tests/arithmetic.l");
 
     return 0;
 }
