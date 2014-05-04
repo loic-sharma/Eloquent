@@ -48,10 +48,11 @@ typedef struct {
 typedef std::vector<Instruction> Instructions;
 typedef std::unordered_map<std::string, Instructions *> Functions;
 
-typedef struct {
+class Program {
+public:
     Functions functions;
     Instructions *instructions;
-} Program;
+};
 
 class Compiler {
 
