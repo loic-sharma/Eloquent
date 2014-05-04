@@ -11,11 +11,6 @@
 #include "compiler.h"
 #include "virtual_machine.h"
 
-
-#include <iostream>
-#include "value.h"
-
-
 void *ParseAlloc(void *(*allocProc)(size_t));
 void Parse(void *parser, int token, const char *tokenInfo, Node **ast);
 void ParseFree(void *parser, void(*freeProc)(void *));
@@ -75,7 +70,9 @@ void execute(const char *file) {
     // Execute the bytecode on our virtual machine.
     VirtualMachine vm;
 
-    vm.execute(program);    
+    vm.execute(program);
+
+    delete program;
 }
 
 int main() {
