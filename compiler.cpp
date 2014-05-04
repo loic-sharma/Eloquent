@@ -10,6 +10,11 @@ Program *Compiler::compile(Node *ast) {
 	Program *program = new Program;
 
 	program->instructions = compile_node(program, ast);
+	program->instructions->push_back({
+		nullptr,
+		Instruction::EndType,
+		0
+	});
 
 	return program;
 }

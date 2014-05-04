@@ -37,7 +37,8 @@ typedef struct {
         DivType,
         ModType,
         IdentifierType,
-        ValueType
+        ValueType,
+        EndType
     };
 
     Value *value;
