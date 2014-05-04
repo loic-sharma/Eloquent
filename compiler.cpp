@@ -324,7 +324,7 @@ Instructions *Compiler::compile_node(Program *program, Node *node) {
 		case Node::Div:
 		case Node::Mod: {
 			Instructions *left = compile_node(program, node->left);
-			Instructions *right = compile_node(program, node->left);
+			Instructions *right = compile_node(program, node->right);
 
 			assert(left);
 			assert(right);
