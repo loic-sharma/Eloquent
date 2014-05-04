@@ -3,8 +3,10 @@
 
 #include <iostream>
 #include <stack>
+#include <cassert>
 
 #include "value.h"
+#include "compiler.h"
 
 void VirtualMachine::execute(Node *AST) {
     Symbols *symbols = new Symbols;
@@ -480,4 +482,290 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
             return nullptr;
             break;
     }
+}
+
+void VirtualMachine::execute(Program *program) {
+    Symbols *symbols = new Symbols;
+
+    std::cout << std::endl;
+
+    evaluate(program->instructions, symbols);
+
+    delete symbols;
+}
+
+Value *VirtualMachine::evaluate(Instructions *instructions, Symbols *symbols) {
+    if (instructions == nullptr) return nullptr;
+
+    if (symbols == nullptr) {
+        std::cerr << "Symbols table cannot be null" << std::endl;
+        exit(1);   
+    }
+
+    std::stack<Value *> stack;
+
+    static std::string x[] = {
+        "Jump",
+        "Print",
+        "Call",
+        "Return",
+        "Assign",
+        "TrueJump",
+        "FalseJump",
+        "And",
+        "Or",
+        "Equals",
+        "NEquals",
+        "Increment",
+        "Decrement",
+        "Add",
+        "Sub",
+        "Mult",
+        "Div",
+        "Mod",
+        "Identifier",
+        "Value"
+    };
+
+    for (auto i = instructions->begin(); i != instructions->end(); ++i) {
+        std::cout << "Instruction: " << x[i->type] << std::endl;
+
+        switch (i->type) {
+            case Instruction::JumpType:
+                i += i->flags;
+                break;
+
+            case Instruction::TrueJumpType:
+            case Instruction::FalseJumpType: {
+                assert(stack.size() >= 1);
+
+                Value *value = stack.top();
+                stack.pop();
+
+                assert(value);
+
+                if (value->to_bool() == (i->type == Instruction::TrueJumpType)) {
+                    i += i->flags;
+                }
+
+                break;
+            }
+
+            case Instruction::PrintType: {
+                assert(stack.size() >= 1);
+
+                Value *value = stack.top();
+                stack.pop();
+
+                assert(value);
+
+                std::cout << value->to_string() << std::endl;
+
+                break;
+            }
+
+            case Instruction::CallType:
+                break;
+            case Instruction::ReturnType:
+                break;
+            case Instruction::AssignType: {
+                assert(stack.size() >= 1);
+
+                (*symbols)[i->value->to_string()] = stack.top();
+                stack.pop();
+
+                break;
+            }
+
+            case Instruction::AndType:
+                break;
+            case Instruction::OrType:
+                break;
+
+            case Instruction::EqualsType:
+            case Instruction::NEqualsType: {
+                assert(stack.size() >= 2);
+
+                Value *right = stack.top();
+                stack.pop();
+
+                Value *left = stack.top();
+                stack.pop();
+
+                assert(left);
+                assert(right);
+
+                bool result = false;
+
+                switch (left->get_type()) {
+                    case BooleanTypeValue:
+                        result = left->to_bool() == right->to_bool();
+                        break;
+                    case IntegerTypeValue:
+                        result = left->to_integer() == right->to_integer();
+                        break;
+                    case DoubleTypeValue:
+                        result = left->to_double() == right->to_double();
+                        break;
+                    case StringTypeValue:
+                        result = left->to_string() == right->to_string();
+                        break;
+
+                    case UnknownTypeValue:
+                    case NullTypeValue:
+                        result = left->get_type() == right->get_type();
+                        break;
+
+                    default:
+                    case ArrayTypeValue:
+                        std::cerr << "Attempting to compare uncomparable types." << std::endl;
+                        exit(1);
+                        break;
+                }
+
+                if (i->type == Instruction::NEqualsType) {
+                    result = !result;
+                }
+
+                stack.push(new Value(result));
+                break;
+            }
+
+            case Instruction::IncrementType:
+            case Instruction::DecrementType: {
+                assert(stack.size() >= 1);
+                
+                Value *result = nullptr;
+                Value *value = stack.top();
+                stack.pop();
+
+                int offset = (i->type == Instruction::IncrementType) ? 1 : -1;
+
+                if (value->get_type() & IntegerTypeValue) {
+                    result = new Value(value->to_integer() + offset);
+                }
+                else {
+                    result = new Value(value->to_double() + offset);
+                }
+
+                stack.push(result);
+                break;
+            }
+
+            case Instruction::AddType:
+            case Instruction::SubType:
+            case Instruction::MultType:
+            case Instruction::DivType:
+            case Instruction::ModType: {
+                assert(stack.size() >= 2);
+                
+                Value *right = stack.top();
+                stack.pop();
+
+                Value *left = stack.top();
+                stack.pop();
+
+                Value *result = nullptr;
+
+                if (left->get_type() & DoubleTypeValue or right->get_type() & DoubleTypeValue) {
+                    double lval = left->to_double();
+                    double rval = right->to_double();
+
+                    switch (i->type) {
+                        case Instruction::AddType: {
+                            result = new Value(lval + rval);
+                            break;
+                        }
+
+                        case Instruction::SubType: {
+                            result = new Value(lval - rval);
+                            break;
+                        }
+
+                        case Instruction::MultType: {
+                            result = new Value(lval * rval);
+                            break;
+                        }
+
+                        case Instruction::DivType: {
+                            result = new Value(lval / rval);
+                            break;
+                        }
+
+                        case Instruction::ModType: {
+                            std::cerr << "Invalid operands to mod expression." << std::endl;
+                            exit(1);
+                            break;
+                        }
+
+                        default:
+                            std::cerr << "Invalid binary expression." << std::endl;
+                            exit(1);
+                            break;
+                    }
+                }
+                else {
+                    long lval = left->to_integer();
+                    long rval = right->to_integer();
+
+                    switch (i->type) {
+                        case Instruction::AddType: {
+                            result = new Value(lval + rval);
+                            break;
+                        }
+
+                        case Instruction::SubType: {
+                            result = new Value(lval - rval);
+                            break;
+                        }
+
+                        case Instruction::MultType: {
+                            result = new Value(lval * rval);
+                            break;
+                        }
+
+                        case Instruction::DivType: {
+                            result = new Value(lval / rval);
+                            break;
+                        }
+
+                        case Instruction::ModType: {
+                            result = new Value(lval % rval);
+                            break;
+                        }
+
+                        default:
+                            std::cerr << "Invalid binary expression." << std::endl;
+                            exit(1);
+                            break;
+                    }
+                }
+
+                stack.push(result);
+
+                break;
+            }
+
+            case Instruction::IdentifierType:
+            case Instruction::ValueType: {
+                Value *value = nullptr;
+
+                if (i->type == Instruction::IdentifierType) {
+                    value = (*symbols)[i->value->to_string()];
+                }
+                else {
+                    value = i->value;
+                }
+
+                assert(value);
+
+                stack.push(value);
+                break;
+            }
+        }
+    }
+
+    if (stack.empty() == true) return nullptr;
+
+    return stack.top();
 }

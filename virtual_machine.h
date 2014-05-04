@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+#include "compiler.h"
+
 class Node;
 class Value;
 
@@ -20,9 +22,11 @@ class VirtualMachine {
 
 public:
     void execute(Node *AST);
+    void execute(Program *program);
 
 private:
     Value *evaluate(Node *node, Symbols *symbols = nullptr);
+    Value *evaluate(Instructions *instructions, Symbols *symbols = nullptr);
 
 	enum State {
 		NormalState,
