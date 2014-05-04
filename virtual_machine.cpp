@@ -540,7 +540,6 @@ Value *VirtualMachine::evaluate(Instructions *instructions, Symbols *symbols) {
                 assert(stack.size() >= 1);
 
                 Value *value = stack.top();
-                stack.pop();
 
                 assert(value);
 
