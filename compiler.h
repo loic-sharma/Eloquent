@@ -53,6 +53,8 @@ class Program {
 public:
     Functions functions;
     Instructions *instructions;
+
+    void print();
 };
 
 class Compiler {

@@ -3,6 +3,46 @@
 #include "ast.h"
 
 #include <cassert>
+#include <iostream>
+
+void Program::print() {
+	static std::string names[] = {
+        "JumpType",
+        "PrintType",
+        "CallType",
+        "ReturnType",
+        "AssignType",
+        "TrueJumpType",
+        "FalseJumpType",
+        "AndType",
+        "OrType",
+        "EqualsType",
+        "NEqualsType",
+        "IncrementType",
+        "DecrementType",
+        "AddType",
+        "SubType",
+        "MultType",
+        "DivType",
+        "ModType",
+        "IdentifierType",
+        "ValueType",
+        "EndType"
+	};
+
+	for (auto i = instructions->begin(); i != instructions->end(); ++i) {
+		std::cout << names[i->type];
+
+		if (i->type == Instruction::IdentifierType or i->type == Instruction::ValueType or i->type == Instruction::AssignType) {
+			std::cout << " (" << i->value->to_string() << ')';
+		}
+		else if (i->type == Instruction::JumpType or i->type == Instruction::TrueJumpType or i->type == Instruction::FalseJumpType) {
+			std::cout << " (" << i->flags << ')';
+		}
+
+		std::cout << '\n';
+	}
+}
 
 Program *Compiler::compile(Node *ast) {
 	if (ast == nullptr) return nullptr;
