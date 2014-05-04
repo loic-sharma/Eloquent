@@ -165,17 +165,16 @@ Instructions *Compiler::compile_node(Program *program, Node *node) {
 		}
 
 		case Node::Assign: {
-			Instructions *left = compile_node(program, node->left);
-			Instructions *right = compile_node(program, node->right);
+			assert(node->left->type == Node::Identifier);
 
-			assert(left);
-			assert(right);
+			Instructions *value = compile_node(program, node->right);
 
-			compiled->insert(compiled->end(), right->begin(), right->end());
-			compiled->insert(compiled->end(), left->begin(), left->end());
+			assert(value);
+
+			compiled->insert(compiled->end(), value->begin(), value->end());
 
 			compiled->push_back({
-				nullptr,
+				node->left->value,
 				Instruction::AssignType,
 				0
 			});
