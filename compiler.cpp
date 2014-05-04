@@ -45,11 +45,15 @@ void Program::print() {
 }
 
 Program *Compiler::compile(Node *ast) {
-	if (ast == nullptr) return nullptr;
-
 	Program *program = new Program;
 
-	program->instructions = compile_node(program, ast);
+	if (ast != nullptr) {
+		program->instructions = compile_node(program, ast);
+	}
+	else {
+		program->instructions = new Instructions;
+	}
+
 	program->instructions->push_back({
 		nullptr,
 		Instruction::EndType,
