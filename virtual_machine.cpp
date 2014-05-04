@@ -567,6 +567,7 @@ Value *VirtualMachine::evaluate(Instructions *instructions, Symbols *symbols) {
                 break;
             case Instruction::ReturnType:
                 break;
+
             case Instruction::AssignType: {
                 assert(stack.size() >= 1);
 
@@ -576,10 +577,31 @@ Value *VirtualMachine::evaluate(Instructions *instructions, Symbols *symbols) {
                 break;
             }
 
-            case Instruction::AndType:
+            case Instruction::AndType: {
+                assert(stack.size() >= 2);
+
+                Value *right = stack.top();
+                stack.pop();
+
+                Value *left = stack.top();
+                stack.pop();
+
+                stack.push(new Value(left->to_bool() and right->to_bool()));
                 break;
-            case Instruction::OrType:
+            }
+
+            case Instruction::OrType: {
+                assert(stack.size() >= 2);
+
+                Value *right = stack.top();
+                stack.pop();
+
+                Value *left = stack.top();
+                stack.pop();
+
+                stack.push(new Value(left->to_bool() and right->to_bool()));
                 break;
+            }
 
             case Instruction::EqualsType:
             case Instruction::NEqualsType: {
@@ -761,6 +783,9 @@ Value *VirtualMachine::evaluate(Instructions *instructions, Symbols *symbols) {
                 stack.push(value);
                 break;
             }
+
+            case Instruction::EndType:
+                break;
         }
     }
 
