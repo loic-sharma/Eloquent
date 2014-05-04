@@ -487,8 +487,6 @@ Value *VirtualMachine::evaluate(Node *node, Symbols *symbols) {
 void VirtualMachine::execute(Program *program) {
     Symbols *symbols = new Symbols;
 
-    std::cout << std::endl;
-
     evaluate(program->instructions, symbols);
 
     delete symbols;
@@ -504,32 +502,7 @@ Value *VirtualMachine::evaluate(Instructions *instructions, Symbols *symbols) {
 
     std::stack<Value *> stack;
 
-    static std::string x[] = {
-        "Jump",
-        "Print",
-        "Call",
-        "Return",
-        "Assign",
-        "TrueJump",
-        "FalseJump",
-        "And",
-        "Or",
-        "Equals",
-        "NEquals",
-        "Increment",
-        "Decrement",
-        "Add",
-        "Sub",
-        "Mult",
-        "Div",
-        "Mod",
-        "Identifier",
-        "Value"
-    };
-
     for (auto i = instructions->begin(); i != instructions->end(); ++i) {
-        std::cout << "Instruction: " << x[i->type] << std::endl;
-
         switch (i->type) {
             case Instruction::JumpType:
                 i += i->flags;

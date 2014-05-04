@@ -20,8 +20,8 @@ void *ParseAlloc(void *(*allocProc)(size_t));
 void Parse(void *parser, int token, const char *tokenInfo, Node **ast);
 void ParseFree(void *parser, void(*freeProc)(void *));
 
-std::string get_file_contents(const char *filename) {
-    std::ifstream in(filename, std::ios::in | std::ios::binary);
+std::string get_file_contents(const char *file) {
+    std::ifstream in(file, std::ios::in | std::ios::binary);
 
     if (in) {
         std::string contents;
@@ -37,9 +37,10 @@ std::string get_file_contents(const char *filename) {
     throw(errno);
 }
 
-int main() {
-    std::string code = get_file_contents("tests/simple_addition.l");
+void execute(const char *file) {
+    std::string code = get_file_contents(file);
 
+    // Parse the script.
     Lexer lexer(code);
 
     void *parser = ParseAlloc(malloc);
@@ -66,46 +67,19 @@ int main() {
     }
     while (lexer.token.type != T_EOF and lexer.token.type != T_UNKNOWN);
 
+    // Compile the syntax tree into bytecode.
     Compiler compiler;
 
     Program *program = compiler.compile(AST);
 
-    static std::string instructions[] = {
-        "Jump",
-        "Print",
-        "Call",
-        "Return",
-        "Assign",
-        "TrueJump",
-        "FalseJump",
-        "And",
-        "Or",
-        "Equals",
-        "NEquals",
-        "Increment",
-        "Decrement",
-        "Add",
-        "Sub",
-        "Mult",
-        "Div",
-        "Mod",
-        "Identifier",
-        "Value"
-    };
+    // Execute the bytecode on our virtual machine.
+    VirtualMachine vm;
 
-    for (auto i = program->instructions->begin(); i != program->instructions->end(); ++i) {
-        std::cout << instructions[i->type];
+    vm.execute(program);    
+}
 
-        if (i->type == Instruction::ValueType or i->type == Instruction::IdentifierType) {
-            std::cout << " (" << i->value->to_string() << ')';
-        }
-
-        std::cout << std::endl;
-    }
-
-    // VirtualMachine vm;
-
-    // vm.execute(AST);
+int main() {
+    execute("tests/hello_world.l");
 
     return 0;
 }
