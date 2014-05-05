@@ -7,7 +7,7 @@
 //
 
 #include "lexer.h"
-#include "parser.h"
+#include "scanner.h"
 #include <iostream>
 
 typedef struct _LexerSpecial {

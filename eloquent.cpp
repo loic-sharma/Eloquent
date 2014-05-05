@@ -7,7 +7,7 @@
 
 #include "ast.h"
 #include "lexer.h"
-#include "parser.h"
+#include "scanner.h"
 #include "compiler.h"
 #include "virtual_machine.h"
 
