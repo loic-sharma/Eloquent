@@ -7,27 +7,27 @@
 
 void Program::print() {
 	static std::string names[] = {
-        "JumpType",
-        "PrintType",
-        "CallType",
-        "ReturnType",
-        "AssignType",
-        "TrueJumpType",
-        "FalseJumpType",
-        "AndType",
-        "OrType",
-        "EqualsType",
-        "NEqualsType",
-        "IncrementType",
-        "DecrementType",
-        "AddType",
-        "SubType",
-        "MultType",
-        "DivType",
-        "ModType",
-        "IdentifierType",
-        "ValueType",
-        "EndType"
+		"JumpType",
+		"PrintType",
+		"CallType",
+		"ReturnType",
+		"AssignType",
+		"TrueJumpType",
+		"FalseJumpType",
+		"AndType",
+		"OrType",
+		"EqualsType",
+		"NEqualsType",
+		"IncrementType",
+		"DecrementType",
+		"AddType",
+		"SubType",
+		"MultType",
+		"DivType",
+		"ModType",
+		"IdentifierType",
+		"ValueType",
+		"EndType"
 	};
 
 	for (auto i = instructions->begin(); i != instructions->end(); ++i) {
