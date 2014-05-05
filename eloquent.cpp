@@ -52,6 +52,7 @@ int main() {
     execute("tests/hello_world.l");
     execute("tests/arithmetic.l");
     execute("tests/conditional.l");
+    execute("tests/iterations.l");
 
     return 0;
 }
