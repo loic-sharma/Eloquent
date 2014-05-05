@@ -166,7 +166,7 @@ Instructions *Compiler::compile_node(Program *program, Node *node) {
 			compiled->push_back({
 				nullptr,
 				Instruction::JumpType,
-				-1 * (long) (condition->size() + block->size() + 1)
+				-1 * (long) (condition->size() + block->size() + 2)
 			});
 
 			delete condition;
