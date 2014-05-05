@@ -76,8 +76,10 @@ void execute(const char *file) {
 }
 
 int main() {
+    execute("tests/comments.l");
     execute("tests/hello_world.l");
     execute("tests/arithmetic.l");
+    execute("tests/conditional.l");
 
     return 0;
 }
