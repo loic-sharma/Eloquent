@@ -1,19 +1,13 @@
-#include <cstdlib>
-#include <iostream>
+
 #include <fstream>
 #include <string>
 #include <cerrno>
 #include <cassert>
 
 #include "ast.h"
-#include "lexer.h"
-#include "scanner.h"
+#include "parser.h"
 #include "compiler.h"
 #include "virtual_machine.h"
-
-void *ParseAlloc(void *(*allocProc)(size_t));
-void Parse(void *parser, int token, const char *tokenInfo, Node **ast);
-void ParseFree(void *parser, void(*freeProc)(void *));
 
 std::string get_file_contents(const char *file) {
     std::ifstream in(file, std::ios::in | std::ios::binary);
@@ -35,32 +29,10 @@ std::string get_file_contents(const char *file) {
 void execute(const char *file) {
     std::string code = get_file_contents(file);
 
-    // Parse the script.
-    Lexer lexer(code);
+    // Parse the code into a syntax tree.
+    Parser parser;
 
-    void *parser = ParseAlloc(malloc);
-    Node *AST = nullptr;
-
-    bool empty = true;
-    
-    do {
-        lexer.lex();
-        
-        if (lexer.token.type == T_EOF) {
-            if (empty == false) {
-                Parse(parser, 0, 0, &AST);
-            }
-        }
-        else {
-            empty = false;
-            
-            char *value = new char[lexer.token.value.length() + 1];
-            std::strcpy(value, lexer.token.value.c_str());
-
-            Parse(parser, lexer.token.type, value, &AST);
-        }
-    }
-    while (lexer.token.type != T_EOF and lexer.token.type != T_UNKNOWN);
+    Node *AST = parser.parse(code);
 
     // Compile the syntax tree into bytecode.
     Compiler compiler;

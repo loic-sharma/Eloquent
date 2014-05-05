@@ -5,8 +5,8 @@ FLAGS = -Wall -Wextra -pedantic -Wvla -std=c++11 -O3
 release:
 release: all
 
-all: lexer.o value.o scanner.o virtual_machine.o compiler.o eloquent.o
-	g++ $(FLAGS) eloquent.o value.o lexer.o scanner.o virtual_machine.o compiler.o -o eloquent
+all: lexer.o value.o scanner.o parser.o virtual_machine.o compiler.o eloquent.o
+	g++ $(FLAGS) eloquent.o value.o lexer.o scanner.o parser.o virtual_machine.o compiler.o -o eloquent
 
 eloquent.o: eloquent.cpp
 	g++ $(FLAGS) -c eloquent.cpp
@@ -16,6 +16,9 @@ virtual_machine.o: virtual_machine.cpp
 
 compiler.o: compiler.cpp
 	g++ $(FLAGS) -c compiler.cpp
+
+parser.o: parser.cpp scanner
+	g++ $(FLAGS) -c parser.cpp
 
 lexer.o: lexer.cpp scanner
 	g++ $(FLAGS) -c lexer.cpp 
