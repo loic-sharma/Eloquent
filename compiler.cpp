@@ -107,22 +107,23 @@ Instructions *Compiler::compile_node(Program *program, Node *node) {
 			Instructions *else_block = compile_node(program, node->right);
 
 			assert(expression);
-			assert(then_block);
 
 			// Evaluate the condition's expression.
 			compiled->insert(compiled->end(), expression->begin(), expression->end());
 
-			// If the condition is false we will want to skip the conditional's
-			// main block. We also skip the instruction that jumps from the end of
-			// the main block to after the end of the else block.
-			compiled->push_back({
-				nullptr,
-				Instruction::FalseJumpType,
-				(long) then_block->size() + 1
-			});
+			// Insert the conditional's then_block block, if it has one.
+			if (then_block) {
+				// If the condition is false we will want to skip the conditional's
+				// then block. We also skip the instruction that jumps from the end of
+				// the main block to after the end of the else block.
+				compiled->push_back({
+					nullptr,
+					Instruction::FalseJumpType,
+					(long) then_block->size()
+				});
 
-			// Insert the conditional's main block.
-			compiled->insert(compiled->end(), then_block->begin(), then_block->end());
+				compiled->insert(compiled->end(), then_block->begin(), then_block->end());				
+			}
 
 			if (else_block) {
 				// Insert a jump instruction at the end of the main block to
