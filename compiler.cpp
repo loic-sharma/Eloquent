@@ -308,18 +308,32 @@ Instructions *Compiler::compile_node(Program *program, Node *node) {
 
 		case Node::Increment:
 		case Node::Decrement: {
-			Instructions *expression = compile_node(program, node->left);
+			assert(node->left->type == Node::Identifier);
 
-			assert(expression);
-
-			compiled->insert(compiled->end(), expression->begin(), expression->end());
 			compiled->push_back({
-				nullptr,
-				(node->type == Node::Increment) ? Instruction::IncrementType : Instruction::DecrementType,
+				node->left->value,
+				Instruction::IdentifierType,
 				0
 			});
 
-			delete expression;
+			compiled->push_back({
+				new Value(1),
+				Instruction::ValueType,
+				0
+			});
+
+			compiled->push_back({
+				node->left->value,
+				(node->type == Node::Increment) ? Instruction::AddType : Instruction::SubType,
+				0
+			});
+
+			compiled->push_back({
+				node->left->value,
+				Instruction::AssignType,
+				0
+			});
+
 			break;
 		}
 
